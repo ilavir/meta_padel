@@ -1,2 +1,3 @@
 FLASK_APP=tennis
 FLASK_DEBUG=1
+FLASK_ENV=development
