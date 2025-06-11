@@ -1,0 +1,2 @@
+FLASK_APP=tennis
+FLASK_DEBUG=1
