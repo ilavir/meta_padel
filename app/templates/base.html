@@ -1,12 +1,19 @@
+{% import '_fields_bootstrap_macros.html' as fields %}
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
     {% block head %}
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        {% if title %}
+        <title>{{ title }} - Paddle Tennis</title>
+        {% else %}
         <title>Paddle Tennis</title>
+        {% endif %}
         <!-- <link rel="shortcut icon" href="{{ url_for('static', filename='img/favicon.ico') }}" type="image/x-icon"> -->
         <link href="{{ url_for('static', filename='css/bootstrap.min.css') }}" rel="stylesheet">
+        <link href="{{ url_for('static', filename='css/style.css') }}" rel="stylesheet">
     {% endblock %}
 </head>
 <body>

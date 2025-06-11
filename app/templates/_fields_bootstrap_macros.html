@@ -1,0 +1,23 @@
+{% macro text(field, label, autofocus) %}
+    {% if label %}
+        {{ field.label(class='form-label') }}
+    {% endif %}
+    {% if autofocus %}
+        {{ field(class='form-control' + (' is-invalid' if field.errors else ''), autofocus="true", placeholder=field.label.text) }}
+    {% else %}
+        {{ field(class='form-control' + (' is-invalid' if field.errors else ''), placeholder=field.label.text) }}
+    {% endif %}
+    {% if field.errors %}
+        <div class="invalid-feedback">{{ field.errors|join(', ') }}</div>
+    {% endif %}
+{% endmacro %}
+
+{% macro select(field, label) %}
+    {% if label %}
+        {{ field.label(class='form-label') }}
+    {% endif %}
+    {{ field(class='form-select' + (' is-invalid' if field.errors else '')) }}
+    {% if field.errors %}
+        <div class="invalid-feedback">{{ field.errors|join(', ') }}</div>
+    {% endif %}
+{% endmacro %}
