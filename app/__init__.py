@@ -4,6 +4,7 @@ import logging.config
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
+from flask_login import LoginManager
 from config import ProductionConfig, DevelopmentConfig, TestingConfig
 
 
@@ -11,11 +12,14 @@ logging.config.fileConfig("logging.conf")
 
 db = SQLAlchemy()
 migrate = Migrate()
+login = LoginManager()
 
 
 def register_extensions(app):
     db.init_app(app)
     migrate.init_app(app, db)
+    login.init_app(app)
+    login.login_view = 'auth.login'
 
 
 def register_blueprints(app):
