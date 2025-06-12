@@ -1,4 +1,40 @@
 {% extends "base.html" %}
 
 {% block content %}
+<div class="container">
+    <div class="row">
+        <div class="col">
+
+            <h1 class="text-center">Рейтинг игроков</h1>
+
+            <table class="table table-striped table-hover">
+                <thead>
+                    <tr>
+                        <th scope="col" style="width: 10px;">№</th>
+                        <th scope="col" style="width: 60px;"></th>
+                        <th scope="col">Игрок</th>
+                        <th scope="col" class="text-end">Очки</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for player in players %}
+                    <tr class="{{ 'table-warning' if player.name == 'Superadmin' }}">
+                        <th scope="row">{{ loop.index }}</th>
+                        {% if player.name == 'Superadmin' or player.name == 'Jane Smith' %}
+                        <td class="text-success"><i class="bi bi-arrow-up"></i>1</td>
+                        {% elif player.name == 'John Doe' %}
+                        <td></td>
+                        {% else %}
+                        <td class="text-danger"><i class="bi bi-arrow-down"></i>1</td>
+                        {% endif %}
+                        <td>{{ player.name }}</td>
+                        <td class="text-end">{{ player.score }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+
+        </div>
+    </div>
+</div>
 {% endblock %}
