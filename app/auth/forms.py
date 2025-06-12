@@ -11,9 +11,9 @@ class LoginForm(FlaskForm):
 
 
 class RegistrationForm(FlaskForm):
-    USERNAME_MAX_LENGTH = 32
+    USERNAME_MAX_LENGTH = 64
     PASSWORD_MAX_LENGTH = 32
-    NAME_MAX_LENGTH = 128
+    NAME_MAX_LENGTH = 64
     PHONE_MAX_LENGTH = 32
     EMAIL_MAX_LENGTH = 128
 
