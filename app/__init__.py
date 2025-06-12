@@ -51,3 +51,5 @@ def create_app():
     register_blueprints(app)
 
     return app
+
+from app import models
