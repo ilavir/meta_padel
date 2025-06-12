@@ -16,12 +16,20 @@
                         <div class="mb-3">
                             {{ fields.text(form.password, false, false) }}
                         </div>
-                        <div class="mb-3 form-check">
-                            {{ form.remember_me(class="form-check-input") }} {{ form.remember_me.label(class="form-check-label") }}
+                        <div class="mb-3">
+                            {{ fields.text(form.password2, false, false) }}
+                        </div>
+                        <div class="mb-3">
+                            {{ fields.text(form.name, false, false) }}
+                        </div>
+                        <div class="mb-3">
+                            {{ fields.text(form.phone, false, false) }}
+                        </div>
+                        <div class="mb-3">
+                            {{ fields.text(form.email, false, false) }}
                         </div>
                         <div class="d-grid gap-2">
                             {{ form.submit(class="btn btn-primary") }}
-                            <a href="{{ url_for('auth.register') }}" role="button" class="btn btn-light">Зарегистрироваться</a>
                         </div>
                     </form>
 
