@@ -18,6 +18,22 @@
 </head>
 <body>
 
+    {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+    <div class="container">
+        <div class="row my-3">
+            <div class="col">
+                <ul class="list-group">
+                    {% for category, message in messages %}
+                    <li class="list-group-item {{ 'list-group-item-danger' if category == 'error' else 'list-group-item-warning' if category == 'warning' else 'list-group-item-info' }}">{{ message }}</li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+    {% endwith %}
+
     {% block content %}{% endblock %}
 
 </body>
