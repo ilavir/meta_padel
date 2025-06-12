@@ -15,7 +15,7 @@ logger = logging.getLogger(__name__)
 @bp.route('/login', methods=['GET', 'POST'])
 def login():
     if current_user.is_authenticated:
-        return redirect('/')
+        return redirect(url_for('dashboard.index'))
 
     form = LoginForm()
 
@@ -39,7 +39,7 @@ def login():
 
         next_page = request.args.get('next')
         if not next_page or urlsplit(next_page).netloc != '':
-            next_page = '/'
+            next_page = url_for('dashboard.index')
 
         return redirect(next_page)
 
@@ -58,7 +58,7 @@ def logout():
 @bp.route('/register', methods=['GET', 'POST'])
 def register():
     if current_user.is_authenticated:
-        return redirect('/')
+        return redirect(url_for('dashboard.index'))
 
     form = RegistrationForm()
 

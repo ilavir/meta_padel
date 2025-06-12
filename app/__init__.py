@@ -26,6 +26,9 @@ def register_blueprints(app):
     from app.auth import bp as auth_bp
     app.register_blueprint(auth_bp)
 
+    from app.dashboard import bp as dashboard_bp
+    app.register_blueprint(dashboard_bp)
+
 
 def create_app():
     app = Flask(__name__, instance_relative_config=True)
