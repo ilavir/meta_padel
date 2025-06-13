@@ -29,6 +29,12 @@ class User(UserMixin, BaseModel):
     password_hash: so.Mapped[Optional[str]] = so.mapped_column(sa.String(128))
     active: so.Mapped[bool] = so.mapped_column(sa.Boolean, default=False)
 
+    scores: so.Mapped[list['Score']] = so.relationship(back_populates='user', passive_deletes=True)
+
+    @property
+    def total_score(self):
+        return sum(score.score for score in self.scores)
+
     def __repr__(self):
         return f'<User {self.username}>'
 
@@ -45,3 +51,18 @@ class User(UserMixin, BaseModel):
 @login.user_loader
 def load_user(id):
     return db.session.get(User, int(id))
+
+
+class Score(db.Model):
+    __tablename__ = 'scores'
+
+    id: so.Mapped[int] = so.mapped_column(primary_key=True)
+    user_id: so.Mapped[int] = so.mapped_column(sa.ForeignKey('users.id'), index=True)
+    score: so.Mapped[int] = so.mapped_column(sa.Integer)
+    comment: so.Mapped[str] = so.mapped_column(sa.String(256))
+    created_at: so.Mapped[datetime] = so.mapped_column(sa.DateTime, server_default=sa.func.now())
+
+    user: so.Mapped[User] = so.relationship(back_populates='scores')
+
+    def __repr__(self):
+        return f'<Score {self.user_id} {self.score}>'
