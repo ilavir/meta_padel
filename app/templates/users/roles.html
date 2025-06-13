@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h1 class="text-center">{{ title }}</h1>
+
+<div class="container">
+    <div class="row">
+        <div class="col">
+
+            <table class="table table-sm table-hover">
+                <thead>
+                    <tr>
+                        <th scope="col">ID</th>
+                        <th scope="col">Имя</th>
+                        <th scope="col">Описание</th>
+                        <th scope="col"></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for role in roles %}
+                    <tr>
+                        <td scope="row">{{ role.id }}</td>
+                        <td>{{ role.name }}</td>
+                        <td>{{ role.description }}</td>
+                        <td class="text-end"><a href="{{ url_for('users.get_roles', role_id=role.id) }}" class="btn btn-primary btn-sm">Edit</a></td>
+                    </tr>
+                    {%endfor %}
+                </tbody>
+            </table>
+
+        </div>
+    </div>
+</div>
+
+{% endblock %}

@@ -28,7 +28,13 @@
             </button>
             <div class="collapse navbar-collapse" id="navbarSupportedContent">
                 <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-                    <li class="nav-item"><a href="{{ url_for('dashboard.index') }}" class="nav-link {{ 'active' if 'dashboard' in request.blueprints }}" {{ 'aria-current=page' if 'dashboard' in request.blueprints }}>Рейтинг</a></li>
+                    <li class="nav-item"><a href="{{ url_for('dashboard.index') }}" class="nav-link {{ 'active' if request.endpoint == 'dashboard.index' }}" {{ 'aria-current=page' if request.endpoint == 'dashboard.index' }}>Рейтинг</a></li>
+                    {% if current_user.has_any_role(['admin', 'superadmin']) %}
+                    <li class="nav-item"><a href="{{ url_for('users.get_users') }}" class="nav-link {{ 'active' if request.endpoint == 'users.get_users' }}" {{ 'aria-current=page' if request.endpoint == 'users.get_users' }}>Пользователи</a></li>
+                    {% endif %}
+                    {% if current_user.has_any_role(['admin', 'superadmin']) %}
+                    <li class="nav-item"><a href="{{ url_for('users.get_roles') }}" class="nav-link {{ 'active' if request.endpoint == 'users.get_roles' }}" {{ 'aria-current=page' if request.endpoint == 'users.get_roles' }}>Роли</a></li>
+                    {% endif %}
                 </ul>
                 <ul class="navbar-nav">
                     {% if current_user.is_anonymous %}

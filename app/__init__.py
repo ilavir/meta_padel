@@ -29,6 +29,9 @@ def register_blueprints(app):
     from app.dashboard import bp as dashboard_bp
     app.register_blueprint(dashboard_bp)
 
+    from app.users import bp as users_bp
+    app.register_blueprint(users_bp, url_prefix='/users')
+
 
 def create_app():
     app = Flask(__name__, instance_relative_config=True)

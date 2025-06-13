@@ -18,17 +18,17 @@
                 </thead>
                 <tbody>
                     {% for player in players %}
-                    <tr class="{{ 'table-warning' if player.name == 'Superadmin' }}">
+                    <tr class="{{ 'table-warning' if player.id == current_user.id }}">
                         <th scope="row">{{ loop.index }}</th>
-                        {% if player.name == 'Superadmin' or player.name == 'Jane Smith' %}
+                        {% if player.name == 'Mary Welch' or player.name == 'Shaun Fields' %}
                         <td class="text-success"><i class="bi bi-arrow-up"></i>1</td>
-                        {% elif player.name == 'John Doe' %}
+                        {% elif player.name == 'Johnny Cooper' %}
                         <td></td>
                         {% else %}
                         <td class="text-danger"><i class="bi bi-arrow-down"></i>1</td>
                         {% endif %}
                         <td>{{ player.name }}</td>
-                        <td class="text-end">{{ player.score }}</td>
+                        <td class="text-end">{{ player.total_score }}</td>
                     </tr>
                     {% endfor %}
                 </tbody>
