@@ -1,9 +1,17 @@
 {% extends "base.html" %}
 
 {% block content %}
-<h1 class="text-center">{{ title }}</h1>
-
 <div class="container">
+    <div class="row">
+        <div class="col">
+            <h1 class="text-center">{{ title }}</h1>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col text-end">
+            <a href="{{ url_for('users.add_role') }}" class="btn btn-primary">Добавить роль</a>
+        </div>
+    </div>
     <div class="row">
         <div class="col">
 
@@ -22,7 +30,7 @@
                         <td scope="row">{{ role.id }}</td>
                         <td>{{ role.name }}</td>
                         <td>{{ role.description }}</td>
-                        <td class="text-end"><a href="{{ url_for('users.get_roles', role_id=role.id) }}" class="btn btn-primary btn-sm">Edit</a></td>
+                        <td class="text-end"><a href="{{ url_for('users.edit_role', role_id=role.id) }}" class="btn btn-primary btn-sm">Изменить</a></td>
                     </tr>
                     {%endfor %}
                 </tbody>

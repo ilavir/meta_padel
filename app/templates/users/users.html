@@ -14,7 +14,9 @@
                         <th scope="col">Логин</th>
                         <th scope="col">Email</th>
                         <th scope="col">Телефон</th>
+                        {% if current_user.has_role('superadmin') %}
                         <th scope="col">Роли</th>
+                        {% endif %}
                         <th scope="col">Активен</th>
                         <th scope="col">Дата регистрации</th>
                         <th scope="col"></th>
@@ -27,18 +29,20 @@
                         <td>{{ user.username }}</td>
                         <td>{{ user.email }}</td>
                         <td>{{ user.phone }}</td>
+                        {% if current_user.has_role('superadmin') %}
                         <td>
                             {% for role in user.roles %}
                             {{ role.name }}{% if not loop.last %}, {% endif %}
                             {% endfor %}
                         </td>
-                        <td>{{ user.active }}</td>
+                        {% endif %}
+                        <td>{{ 'Да' if user.active else 'Нет' }}</td>
                         <td>{{ user.created_at }}</td>
                         <td class="text-end">
                             {% if current_user.has_role('superadmin') %}
-                            <a href="{{ url_for('users.get_users', user_id=user.id) }}" class="btn btn-primary btn-sm">Edit</a>
+                            <a href="{{ url_for('users.get_users', user_id=user.id) }}" class="btn btn-primary btn-sm">Изменить</a>
                             {% elif not user.has_any_role(['superadmin', 'admin']) %}
-                            <a href="{{ url_for('users.get_users', user_id=user.id) }}" class="btn btn-primary btn-sm">Edit</a>
+                            <a href="{{ url_for('users.get_users', user_id=user.id) }}" class="btn btn-primary btn-sm">Изменить</a>
                             {% endif %}
                         </td>
                     </tr>
