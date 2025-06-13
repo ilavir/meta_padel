@@ -55,3 +55,16 @@ def edit_user(user_id):
 
     return render_template('users/user_add_edit.html', title='Редактировать пользователя',
                            form=form, user=user, action='edit')
+
+
+# delete User
+@bp.route('/<int:user_id>/delete', methods=['GET', 'POST'])
+def delete_user(user_id):
+    user = db.get_or_404(User, user_id)
+
+    db.session.delete(user)
+    db.session.commit()
+    logger.info(f'Deleted user "{user.username}"')
+    flash(f'Пользователь "{user.username}" удален')
+
+    return redirect(url_for('users.get_users'))
