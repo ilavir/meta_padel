@@ -34,7 +34,7 @@ def add_role():
             return redirect(url_for('users.add_role'))
 
         # construct data for new Role
-        new_role = Role(name=form.name.data, description=form.description.data)
+        new_role = Role.from_dict(form.data)
 
         # save Role to DB
         db.session.add(new_role)
@@ -64,8 +64,7 @@ def edit_role(role_id):
             return redirect(url_for('users.edit_role', role_id=role.id))
 
         # update Role
-        role.name = form.name.data
-        role.description = form.description.data
+        role.update_from_dict(form.data)
 
         db.session.commit()
         logger.info(f'Updated role "{role.name}"')

@@ -39,6 +39,21 @@ class User(UserMixin, BaseModel):
     def __repr__(self):
         return f'<User {self.username}>'
 
+    @classmethod
+    def from_dict(cls, data):
+        instance = cls()
+        instance.update_from_dict(data)
+        return instance
+
+    def update_from_dict(self, data):
+        allowed_fields = ['username', 'email', 'name', 'phone', 'active']
+        for field in allowed_fields:
+            if field in data:
+                setattr(self, field, data[field])
+
+        if 'password' in data:
+            self.set_password(data['password'])
+
     def is_active(self) -> bool:
         return db.session.scalar(sa.select(User.active).where(User.id == self.id))
 
@@ -84,6 +99,18 @@ class Role(BaseModel):
 
     def __repr__(self):
         return f'<Role {self.name}>'
+
+    @classmethod
+    def from_dict(cls, data):
+        instance = cls()
+        instance.update_from_dict(data)
+        return instance
+
+    def update_from_dict(self, data):
+        allowed_fields = ['name', 'description']
+        for field in allowed_fields:
+            if field in data:
+                setattr(self, field, data[field])
 
 
 class UserRole(db.Model):
