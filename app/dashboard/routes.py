@@ -1,6 +1,6 @@
 import logging
 from flask import render_template, request, redirect, url_for, flash
-from flask_login import login_required
+from flask_login import login_required, current_user
 from . import bp
 import sqlalchemy as sa
 from app import db
@@ -30,8 +30,8 @@ def add_score(user_id):
     comment = request.args.get('comment', None)
 
     user.add_score(score, comment)
-    logger.info(f'Added score {score} for user "{user.username}"')
-    flash(f'Добавлено {score} очков пользователю "{user.username}"')
+    logger.info(f'Added score {score} for user "{user.username}" by {current_user.username}')
+    flash(f'Добавлено {score} очков игроку "{user.name}"')
     db.session.commit()
 
     return redirect(url_for('dashboard.index'))
