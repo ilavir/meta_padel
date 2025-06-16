@@ -1,6 +1,6 @@
 import logging
 from flask import render_template, flash, redirect, url_for
-from flask_login import login_required
+from flask_login import login_required, current_user
 from . import bp
 from .forms import UserAddEditForm
 import sqlalchemy as sa
@@ -28,18 +28,28 @@ def get_users():
 @role_required(['superadmin', 'admin'])
 def edit_user(user_id):
     user = db.get_or_404(User, user_id)
+
+    # restrict to edit 'admin' and 'superadmin' users if you are not 'superadmin'
+    if user.id != current_user.id and user.has_any_role(['superadmin', 'admin']) \
+            and not current_user.has_role('superadmin'):
+        flash('У вас нет прав на редактирование этого пользователя.', 'error')
+        return redirect(url_for('users.get_users'))
+
     form = UserAddEditForm(obj=user)
 
     # Get all available roles
     roles = db.session.scalars(sa.select(Role)).all()
 
     # Form roles checkboxes list
-    form.roles.choices = [(role.id, role.name) for role in roles]
+    if current_user.has_role('superadmin'):
+        form.roles.choices = [(role.id, role.name) for role in roles]
+    else:
+        form.roles.choices = [(role.id, role.name) for role in roles if role.name not in ['superadmin', 'admin']]
 
     if form.validate_on_submit():
         logger.debug(form.data)
 
-        # activate/deactivate user
+        # update user
         user.update_from_dict(form.data)
 
         # Clear existing roles

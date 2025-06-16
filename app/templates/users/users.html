@@ -38,7 +38,11 @@
                         <td class="{{ 'text-danger' if not user.active }}">{{ 'Да' if user.active else 'Нет' }}</td>
                         <td>{{ user.created_at }}</td>
                         <td class="text-end">
+                            {% if user.has_any_role(['superadmin', 'admin']) and current_user.has_role('superadmin') %}
                             <a href="{{ url_for('users.edit_user', user_id=user.id) }}" class="btn btn-primary btn-sm">Изменить</a>
+                            {% elif not user.has_any_role(['superadmin', 'admin']) %}
+                            <a href="{{ url_for('users.edit_user', user_id=user.id) }}" class="btn btn-primary btn-sm">Изменить</a>
+                            {% endif %}
                         </td>
                     </tr>
                     {% endfor %}
