@@ -1,10 +1,12 @@
 import logging
 from flask import render_template, flash, redirect, url_for
+from flask_login import login_required
 from . import bp
 from .forms import RoleAddEditForm
 import sqlalchemy as sa
 from app import db
 from app.models import Role
+from app.services import role_required
 
 
 logger = logging.getLogger(__name__)
@@ -12,6 +14,8 @@ logger = logging.getLogger(__name__)
 
 # get all Roles
 @bp.route('/roles')
+@login_required
+@role_required(['superadmin'])
 def get_roles():
     roles = db.session.scalars(sa.select(Role)).all()
 
@@ -20,8 +24,8 @@ def get_roles():
 
 # add new Role
 @bp.route('/roles/add', methods=['GET', 'POST'])
-# @login_required
-# @role_required(['superadmin'])
+@login_required
+@role_required(['superadmin'])
 def add_role():
     form = RoleAddEditForm()
 
@@ -49,8 +53,8 @@ def add_role():
 
 # edit Role
 @bp.route('/roles/<int:role_id>/edit', methods=['GET', 'POST'])
-# @login_required
-# @role_required(['superadmin'])
+@login_required
+@role_required(['superadmin'])
 def edit_role(role_id):
     role = db.get_or_404(Role, role_id)
     form = RoleAddEditForm(obj=role)
@@ -78,8 +82,8 @@ def edit_role(role_id):
 
 # delete Role
 @bp.route('/roles/<int:role_id>/delete', methods=['GET', 'POST'])
-# @login_required
-# @role_required(['superadmin'])
+@login_required
+@role_required(['superadmin'])
 def delete_role(role_id):
     role = db.get_or_404(Role, role_id)
 

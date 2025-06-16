@@ -1,10 +1,12 @@
 import logging
 from flask import render_template, flash, redirect, url_for
+from flask_login import login_required
 from . import bp
 from .forms import UserAddEditForm
 import sqlalchemy as sa
 from app import db
 from app.models import User, Role
+from app.services import role_required
 
 
 logger = logging.getLogger(__name__)
@@ -12,6 +14,8 @@ logger = logging.getLogger(__name__)
 
 # get all Users
 @bp.route('/')
+@login_required
+@role_required(['superadmin', 'admin'])
 def get_users():
     users = db.session.scalars(sa.select(User)).all()
 
@@ -20,6 +24,8 @@ def get_users():
 
 # edit User
 @bp.route('/<int:user_id>/edit', methods=['GET', 'POST'])
+@login_required
+@role_required(['superadmin', 'admin'])
 def edit_user(user_id):
     user = db.get_or_404(User, user_id)
     form = UserAddEditForm(obj=user)
@@ -59,6 +65,8 @@ def edit_user(user_id):
 
 # delete User
 @bp.route('/<int:user_id>/delete', methods=['GET', 'POST'])
+@login_required
+@role_required(['superadmin', 'admin'])
 def delete_user(user_id):
     user = db.get_or_404(User, user_id)
 

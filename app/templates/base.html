@@ -32,7 +32,7 @@
                     {% if not current_user.is_anonymous and current_user.has_any_role(['admin', 'superadmin']) %}
                     <li class="nav-item"><a href="{{ url_for('users.get_users') }}" class="nav-link {{ 'active' if request.endpoint == 'users.get_users' }}" {{ 'aria-current=page' if request.endpoint == 'users.get_users' }}>Пользователи</a></li>
                     {% endif %}
-                    {% if not current_user.is_anonymous and current_user.has_any_role(['admin', 'superadmin']) %}
+                    {% if not current_user.is_anonymous and current_user.has_any_role(['superadmin']) %}
                     <li class="nav-item"><a href="{{ url_for('users.get_roles') }}" class="nav-link {{ 'active' if request.endpoint == 'users.get_roles' }}" {{ 'aria-current=page' if request.endpoint == 'users.get_roles' }}>Роли</a></li>
                     {% endif %}
                 </ul>

@@ -20,6 +20,7 @@ def register_extensions(app):
     migrate.init_app(app, db)
     login.init_app(app)
     login.login_view = 'auth.login'
+    login.login_message = u"Пожалуйста, войдите в систему, чтобы получить доступ к этой странице."
 
 
 def register_blueprints(app):
