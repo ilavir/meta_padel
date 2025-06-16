@@ -1,13 +1,13 @@
 {% extends "base.html" %}
 
 {% block content %}
-<div class="container">
-    <div class="row">
+<div class="container my-4">
+    <div class="row mb-3">
         <div class="col">
             <h1 class="text-center">{{ title }}</h1>
         </div>
     </div>
-    <div class="row">
+    <div class="row mb-3">
         <div class="col text-end">
             <a href="{{ url_for('users.add_role') }}" class="btn btn-primary">Добавить роль</a>
         </div>

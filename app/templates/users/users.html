@@ -1,9 +1,12 @@
 {% extends "base.html" %}
 
 {% block content %}
-<h1 class="text-center">{{ title }}</h1>
-
-<div class="container">
+<div class="container my-4">
+    <div class="row mb-3">
+        <div class="col">
+            <h1 class="text-center">{{ title }}</h1>
+        </div>
+    </div>
     <div class="row">
         <div class="col">
 
@@ -32,7 +35,7 @@
                             {{ role.name }}{% if not loop.last %}, {% endif %}
                             {% endfor %}
                         </td>
-                        <td>{{ 'Да' if user.active else 'Нет' }}</td>
+                        <td class="{{ 'text-danger' if not user.active }}">{{ 'Да' if user.active else 'Нет' }}</td>
                         <td>{{ user.created_at }}</td>
                         <td class="text-end">
                             <a href="{{ url_for('users.edit_user', user_id=user.id) }}" class="btn btn-primary btn-sm">Изменить</a>

@@ -1,26 +1,29 @@
 {% extends "base.html" %}
 
 {% block content %}
-<h1 class="text-center">{{ title }}</h1>
-
-<form action="" method="post" novalidate class="container">
+<form action="" method="post" novalidate class="container my-4">
     {{ form.hidden_tag() }}
-    <div class="row">
+    <div class="row mb-3">
+        <div class="col">
+            <h1 class="text-center">{{ title }}</h1>
+        </div>
+    </div>
+    <div class="row mb-3">
         <div class="col">
             {{ fields.text(form.username, true, false) }}
         </div>
     </div>
-    <div class="row">
+    <div class="row mb-3">
         <div class="col">
             {{ fields.text(form.email, true, false) }}
         </div>
     </div>
-    <div class="row">
+    <div class="row mb-3">
         <div class="col">
             {{ fields.text(form.phone, true, false) }}
         </div>
     </div>
-    <div class="row">
+    <div class="row mb-3">
         <div class="col">
             <h4>Роли</h4>
             {% for subfield in form.roles %}
@@ -39,7 +42,7 @@
             </div>
         </div>
     </div>
-    <div class="row mt-3">
+    <div class="row mt-4">
         <div class="col">
             <a href="{{ url_for('users.get_users') }}" class="btn btn-secondary">Отменить</a>
             {{ form.submit(class="btn btn-primary") }}
