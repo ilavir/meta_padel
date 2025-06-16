@@ -83,6 +83,11 @@ class User(UserMixin, BaseModel):
         if role in self.roles:
             self.roles.remove(role)
 
+    def add_score(self, score: int, comment: str):
+        """Add score to user"""
+        score = Score(user_id=self.id, score=score, comment=comment)
+        db.session.add(score)
+
 
 @login.user_loader
 def load_user(id):
