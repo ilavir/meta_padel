@@ -27,3 +27,11 @@ To run the application in development mode:
 ```
 flask run
 ```
+
+## DB init
+
+Run for the first time
+
+```
+python init_db.py --create-admin --username admin --email admin@example.com --password secure_password
+```

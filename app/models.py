@@ -26,7 +26,7 @@ class User(UserMixin, BaseModel):
     email: so.Mapped[str] = so.mapped_column(sa.String(128), index=True, unique=True)
     name: so.Mapped[str] = so.mapped_column(sa.String(64))
     phone: so.Mapped[str] = so.mapped_column(sa.String(32))
-    password_hash: so.Mapped[Optional[str]] = so.mapped_column(sa.String(128))
+    password_hash: so.Mapped[Optional[str]] = so.mapped_column(sa.String(256))
     active: so.Mapped[bool] = so.mapped_column(sa.Boolean, default=False)
 
     roles: so.Mapped[list['Role']] = so.relationship(secondary='user_roles', back_populates='users')

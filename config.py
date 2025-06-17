@@ -1,8 +1,9 @@
 import os
 from dotenv import load_dotenv
 
+basedir = os.path.abspath(os.path.dirname(__file__))
+
 if os.environ.get('FLASK_ENV') == 'development':
-    basedir = os.path.abspath(os.path.dirname(__file__))
     load_dotenv(os.path.join(basedir, '.env'), override=True)
 
 
@@ -12,6 +13,7 @@ class Config:
 
 
 class ProductionConfig(Config):
+    SQLALCHEMY_DATABASE_URI = f"mysql+pymysql://{os.environ.get('MARIADB_USER')}:{os.environ.get('MARIADB_PASSWORD')}@{os.environ.get('DATABASE_HOST')}:{os.environ.get('DATABASE_PORT')}/{os.environ.get('MARIADB_DATABASE')}"
     SENTRY_ENVIRONMENT = 'production'
 
 

@@ -1,0 +1,53 @@
+name: meta_padel
+
+services:
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: meta_padel:latest
+    ports:
+      - "5100:5100"
+    env_file:
+      - .env
+    stop_signal: SIGINT
+    restart: unless-stopped
+    depends_on:
+      mariadb:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5100/health"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 15s
+    networks:
+      - meta_padel
+
+  mariadb:
+    image: mariadb:11.6
+    environment:
+      MARIADB_ROOT_PASSWORD: ${MARIADB_ROOT_PASSWORD:-rootpassword}
+      MARIADB_DATABASE: ${MARIADB_DATABASE:-meta_padel_db}
+      MARIADB_USER: ${MARIADB_USER:-padel_user}
+      MARIADB_PASSWORD: ${MARIADB_PASSWORD:-padel_password}
+    volumes:
+      - mariadb_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mariadb-admin", "ping", "-h", "localhost", "-u", "${MARIADB_USER}", "-p${MARIADB_PASSWORD}"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 15s
+    restart: unless-stopped
+    networks:
+      - meta_padel
+
+volumes:
+  mariadb_data:
+    name: meta_padel-mariadb_data
+
+networks:
+  meta_padel:
+    driver: bridge
+    name: meta_padel-network

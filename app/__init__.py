@@ -37,21 +37,15 @@ def register_blueprints(app):
 def create_app():
     app = Flask(__name__, instance_relative_config=True)
 
-    # Get environment from environment variable with a default value
+    # Get environment and select config class
     flask_env = os.getenv('FLASK_ENV', 'production').lower()
-
-    # Map environment names to config classes
-    config_map = {
+    config_class = {
         'development': DevelopmentConfig,
-        'testing': TestingConfig,
-        'production': ProductionConfig
-    }
+        'testing': TestingConfig
+    }.get(flask_env, ProductionConfig)
 
-    flask_env = os.getenv('FLASK_ENV', 'production').lower()
-    selected_config = config_map.get(flask_env, ProductionConfig)
-
-    app.logger.info(f"{flask_env.capitalize()} environment detected. Using {selected_config.__name__}.")
-    app.config.from_object(selected_config)
+    app.logger.info(f"{flask_env.capitalize()} environment detected. Using {config_class.__name__}.")
+    app.config.from_object(config_class)
 
     # Validate critical configuration
     if not app.config.get('SECRET_KEY'):
