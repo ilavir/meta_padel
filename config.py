@@ -13,7 +13,12 @@ class Config:
 
 
 class ProductionConfig(Config):
-    SQLALCHEMY_DATABASE_URI = f"mysql+pymysql://{os.environ.get('MARIADB_USER')}:{os.environ.get('MARIADB_PASSWORD')}@{os.environ.get('DATABASE_HOST')}:{os.environ.get('DATABASE_PORT')}/{os.environ.get('MARIADB_DATABASE')}"
+    DB_HOST = os.environ.get('DATABASE_HOST')
+    DB_PORT = os.environ.get('DATABASE_PORT')
+    DB_USER = os.environ.get('MARIADB_USER')
+    DB_PASSWORD = os.environ.get('MARIADB_PASSWORD')
+    DB_NAME = os.environ.get('MARIADB_DATABASE')
+    SQLALCHEMY_DATABASE_URI = f"mysql+pymysql://{DB_USER}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/{DB_NAME}"
     SENTRY_ENVIRONMENT = 'production'
 
 
