@@ -6,7 +6,7 @@ from . import bp
 from .forms import LoginForm, RegistrationForm
 import sqlalchemy as sa
 from app import db
-from app.models import User
+from app.models import User, Role
 
 
 logger = logging.getLogger(__name__)
@@ -65,11 +65,17 @@ def register():
     if form.validate_on_submit():
         logger.debug(f'Registration form submitted. Username: {form.username.data}')
 
-        user = User(username=form.username.data,
-                    email=form.email.data,
-                    name=form.name.data,
-                    phone=form.phone.data)
-        user.set_password(form.password.data)
+        # # check if there are users in DB
+        # existing_user = db.session.scalar(sa.select(User))
+
+        user = User.from_dict(form.data)
+
+        # # make user "superadmin" and active if no users in DB
+        # if not existing_user:
+        #     user.roles.append(db.session.scalar(sa.select(Role).where(Role.name == 'superadmin')))
+        #     user.active = True
+
+        user.roles.append(db.session.scalar(sa.select(Role).where(Role.name == 'player')))
         db.session.add(user)
         db.session.commit()
 
