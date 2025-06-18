@@ -10,44 +10,46 @@
     <div class="row">
         <div class="col">
 
-            <table class="table table-sm table-hover table-responsive">
-                <thead>
-                    <tr>
-                        <th scope="col">Имя</th>
-                        <th scope="col">Логин</th>
-                        <th scope="col">Email</th>
-                        <th scope="col">Телефон</th>
-                        <th scope="col">Роли</th>
-                        <th scope="col">Активен</th>
-                        <th scope="col">Дата регистрации</th>
-                        <th scope="col"></th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for user in users %}
-                    <tr>
-                        <td scope="row">{{ user.name }}</td>
-                        <td>{{ user.username }}</td>
-                        <td>{{ user.email }}</td>
-                        <td>{{ user.phone }}</td>
-                        <td>
-                            {% for role in user.roles %}
-                            {{ role.name }}{% if not loop.last %}, {% endif %}
-                            {% endfor %}
-                        </td>
-                        <td class="{{ 'text-danger' if not user.active }}">{{ 'Да' if user.active else 'Нет' }}</td>
-                        <td>{{ user.created_at }}</td>
-                        <td class="text-end">
-                            {% if user.has_any_role(['superadmin', 'admin']) and current_user.has_role('superadmin') %}
-                            <a href="{{ url_for('users.edit_user', user_id=user.id) }}" class="btn btn-primary btn-sm">Изменить</a>
-                            {% elif not user.has_any_role(['superadmin', 'admin']) %}
-                            <a href="{{ url_for('users.edit_user', user_id=user.id) }}" class="btn btn-primary btn-sm">Изменить</a>
-                            {% endif %}
-                        </td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
+            <div class="table-responsive">
+                <table class="table table-sm table-hover">
+                    <thead>
+                        <tr>
+                            <th scope="col">Имя</th>
+                            <th scope="col">Логин</th>
+                            <th scope="col">Email</th>
+                            <th scope="col">Телефон</th>
+                            <th scope="col">Роли</th>
+                            <th scope="col">Активен</th>
+                            <th scope="col">Дата регистрации</th>
+                            <th scope="col"></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for user in users %}
+                        <tr>
+                            <td scope="row">{{ user.name }}</td>
+                            <td>{{ user.username }}</td>
+                            <td>{{ user.email }}</td>
+                            <td>{{ user.phone }}</td>
+                            <td>
+                                {% for role in user.roles %}
+                                {{ role.name }}{% if not loop.last %}, {% endif %}
+                                {% endfor %}
+                            </td>
+                            <td class="{{ 'text-danger' if not user.active }}">{{ 'Да' if user.active else 'Нет' }}</td>
+                            <td>{{ user.created_at }}</td>
+                            <td class="text-end">
+                                {% if user.has_any_role(['superadmin', 'admin']) and current_user.has_role('superadmin') %}
+                                <a href="{{ url_for('users.edit_user', user_id=user.id) }}" class="btn btn-primary btn-sm">Изменить</a>
+                                {% elif not user.has_any_role(['superadmin', 'admin']) %}
+                                <a href="{{ url_for('users.edit_user', user_id=user.id) }}" class="btn btn-primary btn-sm">Изменить</a>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
 
         </div>
     </div>
