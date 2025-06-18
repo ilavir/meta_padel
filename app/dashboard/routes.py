@@ -30,7 +30,7 @@ def add_score(user_id):
     comment = request.args.get('comment', None)
 
     user.add_score(score, comment)
-    logger.info(f'Added score {score} for user "{user.username}" by {current_user.username}')
+    logger.info(f'Added score {score} for user "{user.email}" by {current_user.email}')
     flash(f'Добавлено {score} очков игроку "{user.name}"')
     db.session.commit()
 

@@ -61,8 +61,8 @@ def edit_user(user_id):
 
         db.session.commit()
 
-        logger.info(f'Updated user "{user.username}"')
-        flash(f'Пользовать "{user.username}" сохранен')
+        logger.info(f'Updated user "{user.email}"')
+        flash(f'Пользовать "{user.email}" сохранен')
 
         return redirect(url_for('users.get_users'))
 
@@ -82,7 +82,7 @@ def delete_user(user_id):
 
     db.session.delete(user)
     db.session.commit()
-    logger.info(f'Deleted user "{user.username}"')
-    flash(f'Пользователь "{user.username}" удален')
+    logger.info(f'Deleted user "{user.email}"')
+    flash(f'Пользователь "{user.email}" удален')
 
     return redirect(url_for('users.get_users'))

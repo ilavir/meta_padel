@@ -34,7 +34,7 @@ def register_blueprints(app):
     app.register_blueprint(users_bp, url_prefix='/users')
 
 
-def create_app():
+def create_app(config_class=ProductionConfig):
     app = Flask(__name__, instance_relative_config=True)
 
     # Get environment and select config class
@@ -42,7 +42,7 @@ def create_app():
     config_class = {
         'development': DevelopmentConfig,
         'testing': TestingConfig
-    }.get(flask_env, ProductionConfig)
+    }.get(flask_env, config_class)
 
     app.logger.info(f"{flask_env.capitalize()} environment detected. Using {config_class.__name__}.")
     app.config.from_object(config_class)

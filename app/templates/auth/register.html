@@ -11,7 +11,7 @@
                     <form action="" method="post" novalidate>
                         {{ form.hidden_tag() }}
                         <div class="mb-3">
-                            {{ fields.text(form.username, false, false) }}
+                            {{ fields.text(form.email, false, false) }}
                         </div>
                         <div class="mb-3">
                             {{ fields.text(form.password, false, false) }}
@@ -26,7 +26,7 @@
                             {{ fields.text(form.phone, false, false) }}
                         </div>
                         <div class="mb-3">
-                            {{ fields.text(form.email, false, false) }}
+                            {{ fields.select(form.gender, false) }}
                         </div>
                         <div class="d-grid gap-2">
                             {{ form.submit(class="btn btn-primary") }}

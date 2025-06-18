@@ -20,13 +20,13 @@ def login():
     form = LoginForm()
 
     if form.validate_on_submit():
-        logger.debug(f'Login form submitted. Username: {form.username.data}, Remember Me: {form.remember_me.data}')
+        logger.debug(f'Login form submitted. Email: {form.email.data}, Remember Me: {form.remember_me.data}')
 
-        user = db.session.scalar(sa.select(User).where(User.username == form.username.data))
+        user = db.session.scalar(sa.select(User).where(User.email == form.email.data))
 
         # check for user/password
         if user is None or not user.check_password(form.password.data):
-            flash('Неверное имя пользователя или пароль', 'error')
+            flash('Неверный адрес электронной почты или пароль', 'error')
             return redirect(url_for('auth.login'))
 
         # check if user active
@@ -35,7 +35,7 @@ def login():
             return redirect(url_for('auth.login'))
 
         login_user(user, remember=form.remember_me.data)
-        logger.debug(f'User {user.username} logged in')
+        logger.debug(f'User {user.email} logged in')
 
         next_page = request.args.get('next')
         if not next_page or urlsplit(next_page).netloc != '':
@@ -48,7 +48,7 @@ def login():
 
 @bp.route('/logout')
 def logout():
-    logger.debug(f'Logout user: {current_user.username}')
+    logger.debug(f'Logout user: {current_user.email}')
 
     logout_user()
     flash('Вы вышли из системы')
@@ -63,7 +63,7 @@ def register():
     form = RegistrationForm()
 
     if form.validate_on_submit():
-        logger.debug(f'Registration form submitted. Username: {form.username.data}')
+        logger.debug(f'Registration form submitted. Email: {form.email.data}')
 
         # # check if there are users in DB
         # existing_user = db.session.scalar(sa.select(User))
@@ -79,7 +79,7 @@ def register():
         db.session.add(user)
         db.session.commit()
 
-        flash('Пользователь зарегистрирован')
+        flash('Вы успешно зарегистрированы')
         return redirect(url_for('auth.login'))
 
     return render_template('auth/register.html', title='Регистрация', form=form)

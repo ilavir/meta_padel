@@ -33,5 +33,5 @@ flask run
 Run for the first time
 
 ```
-python init_db.py --create-admin --username admin --email admin@example.com --password secure_password
+python init_db.py --create-admin --email admin@example.com --password secure_password
 ```

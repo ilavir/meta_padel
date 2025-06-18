@@ -6,9 +6,10 @@ import argparse
 import sqlalchemy as sa
 from app import create_app, db
 from app.models import User, Role
+from config import ProductionConfig, DevelopmentConfig, TestingConfig
 
 # Initialize Flask app
-app = create_app()
+app = create_app(config_class=DevelopmentConfig)
 
 
 def create_roles():
@@ -38,20 +39,20 @@ def create_roles():
     return created_roles
 
 
-def create_superadmin(username, email, password, name="Super Admin", phone=""):
+def create_superadmin(email, password, name="Super Admin", phone="", gender="male"):
     """Create a superadmin user if it doesn't exist"""
     # Check if user already exists
-    existing_user = db.session.scalar(sa.select(User).where(User.username == username))
+    existing_user = db.session.scalar(sa.select(User).where(User.email == email))
     if existing_user:
-        print(f"User '{username}' already exists")
+        print(f"User '{email}' already exists")
         return existing_user
 
     # Create superadmin user
     user = User(
-        username=username,
         email=email,
         name=name,
         phone=phone,
+        gender=gender,
         active=True
     )
     user.set_password(password)
@@ -63,11 +64,11 @@ def create_superadmin(username, email, password, name="Super Admin", phone=""):
 
     db.session.add(user)
     db.session.commit()
-    print(f"Superadmin user '{username}' created successfully")
+    print(f"Superadmin user '{email}' created successfully")
     return user
 
 
-def init_database(create_admin=False, username=None, email=None, password=None):
+def init_database(create_admin=False, email=None, password=None):
     """Initialize the database with required roles and optionally a superadmin user"""
     print("Starting database initialization...")
 
@@ -76,10 +77,10 @@ def init_database(create_admin=False, username=None, email=None, password=None):
 
     # Create superadmin user if requested
     if create_admin:
-        if not all([username, email, password]):
-            print("Error: Username, email, and password are required to create a superadmin user")
+        if not all([email, password]):
+            print("Error: email, and password are required to create a superadmin user")
             return
-        create_superadmin(username, email, password)
+        create_superadmin(email, password)
 
     print("Database initialization completed successfully!")
 
@@ -87,7 +88,6 @@ def init_database(create_admin=False, username=None, email=None, password=None):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Initialize database with roles and optionally create a superadmin user")
     parser.add_argument("--create-admin", action="store_true", help="Create a superadmin user")
-    parser.add_argument("--username", help="Username for the superadmin user")
     parser.add_argument("--email", help="Email for the superadmin user")
     parser.add_argument("--password", help="Password for the superadmin user")
     parser.add_argument("--name", default="Super Admin", help="Name for the superadmin user")
@@ -99,7 +99,6 @@ if __name__ == "__main__":
         if args.create_admin:
             init_database(
                 create_admin=True,
-                username=args.username,
                 email=args.email,
                 password=args.password
             )
