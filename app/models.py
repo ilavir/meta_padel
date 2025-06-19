@@ -48,7 +48,7 @@ class User(UserMixin, BaseModel):
         return instance
 
     def update_from_dict(self, data):
-        allowed_fields = ['email', 'name', 'phone', 'gender', 'active']
+        allowed_fields = ['email', 'name', 'phone', 'gender', 'active', 'about_me']
         for field in allowed_fields:
             if field in data:
                 setattr(self, field, data[field])

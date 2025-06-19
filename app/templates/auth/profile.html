@@ -7,15 +7,21 @@
             <h1 class="text-center">{{ title }}</h1>
         </div>
     </div>
+    <div class="row mb-3">
+        <div class="col">
+            <a href="{{ url_for('auth.edit_profile') }}" class="btn btn-primary">Редактировать профиль</a>
+        </div>
+    </div>
     <div class="row">
         <div class="col">
-            Email: {{ user.email }}<br>
-            Имя: {{ user.name }}<br>
-            Пол: {{ user.gender }}<br>
-            Телефон: {{ user.phone }}<br>
-            Дата регистрации: {{ user.created_at }}<br>
-            {% if user.about_me %}<p>{{ user.about_me }}</p>{% endif %}
-            {% if user.last_seen %}<p>Последний визит: {{ user.last_seen }}</p>{% endif %}
+            <p><strong>Email</strong>: {{ user.email }}<br>
+            <strong>Имя</strong>: {{ user.name }}<br>
+            <strong>Пол</strong>: {{ 'Мужской' if user.gender == 'male' else 'Женский' if user.gender == 'female' else '' }}<br>
+            <strong>Телефон</strong>: {{ user.phone }}</p>
+            {% if user.about_me %}<p><strong>О себе</strong>: {{ user.about_me }}</p>{% endif %}
+
+            <p><strong>Дата регистрации</strong>: {{ user.created_at }}<br>
+            {% if user.last_seen %}<strong>Последний визит</strong>: {{ user.last_seen }}{% endif %}</p>
         </div>
     </div>
 </div>

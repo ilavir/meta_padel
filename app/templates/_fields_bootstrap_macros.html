@@ -21,3 +21,13 @@
         <div class="invalid-feedback">{{ field.errors|join(', ') }}</div>
     {% endif %}
 {% endmacro %}
+
+{% macro textarea(field, label, rows=2) %}
+    {% if label %}
+        {{ field.label(class='form-label') }}
+    {% endif %}
+    {{ field(class='form-control' + (' is-invalid' if field.errors else ''), placeholder=field.label.text, rows=rows) }}
+    {% if field.errors %}
+        <div class="invalid-feedback">{{ field.errors|join(', ') }}</div>
+    {% endif %}
+{% endmacro %}

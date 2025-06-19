@@ -4,7 +4,7 @@ from datetime import datetime, timezone
 from flask import render_template, redirect, url_for, flash, request
 from flask_login import current_user, login_user, logout_user, login_required
 from . import bp
-from .forms import LoginForm, RegistrationForm
+from .forms import LoginForm, RegistrationForm, EditProfileForm
 import sqlalchemy as sa
 from app import db
 from app.models import User, Role
@@ -91,3 +91,23 @@ def register():
 @login_required
 def profile():
     return render_template('auth/profile.html', title='Профиль', user=current_user)
+
+
+@bp.route('/profile/edit', methods=['GET', 'POST'])
+@login_required
+def edit_profile():
+    form = EditProfileForm(obj=current_user)
+
+    if form.validate_on_submit():
+        logger.debug(f'Edit profile form submitted. Email: {form.email.data}')
+
+        current_user.update_from_dict(form.data)
+        db.session.commit()
+
+        flash('Профиль обновлён')
+        return redirect(url_for('auth.profile'))
+
+    # elif request.method == 'GET':
+    #     form = EditProfileForm(current_user.email, obj=current_user)
+
+    return render_template('auth/edit_profile.html', title='Редактирование профиля', form=form)
