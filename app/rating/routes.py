@@ -1,4 +1,5 @@
 import logging
+from datetime import datetime, timezone
 from flask import render_template, request, redirect, url_for, flash
 from flask_login import login_required, current_user
 from . import bp
@@ -24,7 +25,20 @@ def index():
     players = [user for user in users if user.has_role('player')]
     players = sorted(players, key=lambda user: user.total_score, reverse=True)
 
-    return render_template('rating/index.html', title='Рейтинг игроков', gender=gender, players=players)
+    # Assign current rank and calculate rank change
+    ranked_players = []
+    for idx, user in enumerate(players, start=1):
+        rank_change = None
+        if user.last_rank is not None:
+            rank_change = user.last_rank - idx
+
+        ranked_players.append({
+            'rank': idx,
+            'rank_change': rank_change,
+            'user': user
+        })
+
+    return render_template('rating/index.html', title='Рейтинг игроков', gender=gender, players=ranked_players)
 
 
 @bp.route('/<int:user_id>/add_score')
@@ -42,3 +56,17 @@ def add_score(user_id):
     db.session.commit()
 
     return redirect(url_for('rating.index'))
+
+
+@bp.route('/_update_ranks')
+def update_ranks():
+    users = db.session.scalars(sa.select(User).where(User.active)).all()
+    players = [user for user in users if user.has_role('player')]
+    players = sorted(players, key=lambda user: user.total_score, reverse=True)
+
+    for idx, player in enumerate(players, start=1):
+        player.last_rank = idx
+
+    db.session.commit()
+
+    return {'success': True, 'message': 'Ranks updated successfully', 'date': datetime.now(timezone.utc)}

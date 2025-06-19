@@ -33,31 +33,27 @@
                         <th scope="col" style="width: 60px;"></th>
                         <th scope="col">Игрок</th>
                         <th scope="col" class="text-end">Очки</th>
-                        <!-- {% if not current_user.is_anonymous and current_user.has_any_role(['admin', 'superadmin']) %}
-                        <th scope="col" class="col-2"></th>
-                        {% endif %} -->
                     </tr>
                 </thead>
                 <tbody>
                     {% for player in players %}
                     <tr class="{{ 'table-warning' if player.id == current_user.id }}">
-                        <th scope="row">{{ loop.index }}</th>
-                        {% if player.name == 'Mary Welch' or player.name == 'Shaun Fields' %}
-                        <td class="text-success"><i class="bi bi-arrow-up"></i>1</td>
-                        {% elif player.name == 'Johnny Cooper' %}
-                        <td></td>
-                        {% else %}
-                        <td class="text-danger"><i class="bi bi-arrow-down"></i>1</td>
-                        {% endif %}
-                        <td>{{ player.name }}</td>
-                        <td class="text-end">{{ player.total_score }}</td>
-                        <!-- {% if not current_user.is_anonymous and current_user.has_any_role(['admin', 'superadmin']) %}
+                        <th scope="row">{{ player.rank }}</th>
                         <td>
-                            <a href="{{ url_for('rating.add_score', user_id=player.id, score=10, comment='Добавлено 10 очков администратором ' + current_user.email) }}" class="btn btn-sm btn-success">+10</a>
-                            <a href="{{ url_for('rating.add_score', user_id=player.id, score=20, comment='Добавлено 20 очков администратором ' + current_user.email) }}" class="btn btn-sm btn-success">+20</a>
-                            <a href="{{ url_for('rating.add_score', user_id=player.id, score=30, comment='Добавлено 30 очков администратором ' + current_user.email) }}" class="btn btn-sm btn-success">+30</a>
+                            {% if player.rank_change is not none %}
+                                {% if player.rank_change > 0 %}
+                                    <span class="text-success"><i class="bi bi-arrow-up"></i>{{ player.rank_change }}</span>
+                                {% elif player.rank_change < 0 %}
+                                    <span class="text-danger"><i class="bi bi-arrow-down"></i>{{ player.rank_change|abs }}</span>
+                                {% else %}
+                                    <span class="text-muted">0</span>
+                                {% endif %}
+                            {% else %}
+                                <span class="text-muted">–</span>
+                            {% endif %}
                         </td>
-                        {% endif %} -->
+                        <td>{{ player.user.name }}</td>
+                        <td class="text-end">{{ player.user.total_score }}</td>
                     </tr>
                     {% endfor %}
                 </tbody>

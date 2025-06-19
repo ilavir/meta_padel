@@ -30,6 +30,7 @@ class User(UserMixin, BaseModel):
     password_hash: so.Mapped[Optional[str]] = so.mapped_column(sa.String(256))
     active: so.Mapped[bool] = so.mapped_column(sa.Boolean, default=False)
     last_seen: so.Mapped[Optional[datetime]] = so.mapped_column(sa.DateTime, default=None)
+    last_rank: so.Mapped[Optional[int]] = so.mapped_column(sa.Integer, default=None)
 
     roles: so.Mapped[list['Role']] = so.relationship(secondary='user_roles', back_populates='users')
     scores: so.Mapped[list['Score']] = so.relationship(back_populates='user', passive_deletes=True)
