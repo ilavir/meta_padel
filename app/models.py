@@ -26,8 +26,10 @@ class User(UserMixin, BaseModel):
     name: so.Mapped[str] = so.mapped_column(sa.String(128))
     phone: so.Mapped[str] = so.mapped_column(sa.String(32))
     gender: so.Mapped[str] = so.mapped_column(sa.String(32), index=True)
+    about_me: so.Mapped[Optional[str]] = so.mapped_column(sa.String(256), default=None)
     password_hash: so.Mapped[Optional[str]] = so.mapped_column(sa.String(256))
     active: so.Mapped[bool] = so.mapped_column(sa.Boolean, default=False)
+    last_seen: so.Mapped[Optional[datetime]] = so.mapped_column(sa.DateTime, default=None)
 
     roles: so.Mapped[list['Role']] = so.relationship(secondary='user_roles', back_populates='users')
     scores: so.Mapped[list['Score']] = so.relationship(back_populates='user', passive_deletes=True)

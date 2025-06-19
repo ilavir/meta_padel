@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container my-4">
+    <div class="row mb-3">
+        <div class="col">
+            <h1 class="text-center">{{ title }}</h1>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col">
+            Email: {{ user.email }}<br>
+            Имя: {{ user.name }}<br>
+            Пол: {{ user.gender }}<br>
+            Телефон: {{ user.phone }}<br>
+            Дата регистрации: {{ user.created_at }}<br>
+            {% if user.about_me %}<p>{{ user.about_me }}</p>{% endif %}
+            {% if user.last_seen %}<p>Последний визит: {{ user.last_seen }}</p>{% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

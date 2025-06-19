@@ -1,7 +1,8 @@
 import logging
 from urllib.parse import urlsplit
+from datetime import datetime, timezone
 from flask import render_template, redirect, url_for, flash, request
-from flask_login import current_user, login_user, logout_user
+from flask_login import current_user, login_user, logout_user, login_required
 from . import bp
 from .forms import LoginForm, RegistrationForm
 import sqlalchemy as sa
@@ -10,6 +11,13 @@ from app.models import User, Role
 
 
 logger = logging.getLogger(__name__)
+
+
+@bp.before_app_request
+def before_request():
+    if current_user.is_authenticated:
+        current_user.last_seen = sa.func.now()
+        db.session.commit()
 
 
 @bp.route('/login', methods=['GET', 'POST'])
@@ -69,12 +77,6 @@ def register():
         # existing_user = db.session.scalar(sa.select(User))
 
         user = User.from_dict(form.data)
-
-        # # make user "superadmin" and active if no users in DB
-        # if not existing_user:
-        #     user.roles.append(db.session.scalar(sa.select(Role).where(Role.name == 'superadmin')))
-        #     user.active = True
-
         user.roles.append(db.session.scalar(sa.select(Role).where(Role.name == 'player')))
         db.session.add(user)
         db.session.commit()
@@ -83,3 +85,9 @@ def register():
         return redirect(url_for('auth.login'))
 
     return render_template('auth/register.html', title='Регистрация', form=form)
+
+
+@bp.route('/profile')
+@login_required
+def profile():
+    return render_template('auth/profile.html', title='Профиль', user=current_user)
