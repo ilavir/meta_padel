@@ -27,8 +27,8 @@ def register_blueprints(app):
     from app.auth import bp as auth_bp
     app.register_blueprint(auth_bp)
 
-    from app.dashboard import bp as dashboard_bp
-    app.register_blueprint(dashboard_bp)
+    from app.rating import bp as rating_bp
+    app.register_blueprint(rating_bp)
 
     from app.users import bp as users_bp
     app.register_blueprint(users_bp, url_prefix='/users')

@@ -1,6 +1,5 @@
 import logging
 from urllib.parse import urlsplit
-from datetime import datetime, timezone
 from flask import render_template, redirect, url_for, flash, request
 from flask_login import current_user, login_user, logout_user, login_required
 from . import bp
@@ -23,7 +22,7 @@ def before_request():
 @bp.route('/login', methods=['GET', 'POST'])
 def login():
     if current_user.is_authenticated:
-        return redirect(url_for('dashboard.index'))
+        return redirect(url_for('rating.index'))
 
     form = LoginForm()
 
@@ -47,7 +46,7 @@ def login():
 
         next_page = request.args.get('next')
         if not next_page or urlsplit(next_page).netloc != '':
-            next_page = url_for('dashboard.index')
+            next_page = url_for('rating.index')
 
         return redirect(next_page)
 
@@ -66,7 +65,7 @@ def logout():
 @bp.route('/register', methods=['GET', 'POST'])
 def register():
     if current_user.is_authenticated:
-        return redirect(url_for('dashboard.index'))
+        return redirect(url_for('rating.index'))
 
     form = RegistrationForm()
 
@@ -106,8 +105,5 @@ def edit_profile():
 
         flash('Профиль обновлён')
         return redirect(url_for('auth.profile'))
-
-    # elif request.method == 'GET':
-    #     form = EditProfileForm(current_user.email, obj=current_user)
 
     return render_template('auth/edit_profile.html', title='Редактирование профиля', form=form)

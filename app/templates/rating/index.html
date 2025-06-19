@@ -36,9 +36,9 @@
                         <td class="text-end">{{ player.total_score }}</td>
                         {% if not current_user.is_anonymous and current_user.has_any_role(['admin', 'superadmin']) %}
                         <td>
-                            <a href="{{ url_for('dashboard.add_score', user_id=player.id, score=10, comment='Добавлено 10 очков администратором ' + current_user.email) }}" class="btn btn-sm btn-success">+10</a>
-                            <a href="{{ url_for('dashboard.add_score', user_id=player.id, score=20, comment='Добавлено 20 очков администратором ' + current_user.email) }}" class="btn btn-sm btn-success">+20</a>
-                            <a href="{{ url_for('dashboard.add_score', user_id=player.id, score=30, comment='Добавлено 30 очков администратором ' + current_user.email) }}" class="btn btn-sm btn-success">+30</a>
+                            <a href="{{ url_for('rating.add_score', user_id=player.id, score=10, comment='Добавлено 10 очков администратором ' + current_user.email) }}" class="btn btn-sm btn-success">+10</a>
+                            <a href="{{ url_for('rating.add_score', user_id=player.id, score=20, comment='Добавлено 20 очков администратором ' + current_user.email) }}" class="btn btn-sm btn-success">+20</a>
+                            <a href="{{ url_for('rating.add_score', user_id=player.id, score=30, comment='Добавлено 30 очков администратором ' + current_user.email) }}" class="btn btn-sm btn-success">+30</a>
                         </td>
                         {% endif %}
                     </tr>

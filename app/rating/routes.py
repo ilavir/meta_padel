@@ -17,7 +17,7 @@ def index():
     players = [user for user in users if user.has_role('player')]
     players = sorted(players, key=lambda user: user.total_score, reverse=True)
 
-    return render_template('dashboard/index.html', title='Рейтинг игроков', players=players)
+    return render_template('rating/index.html', title='Рейтинг игроков', players=players)
 
 
 @bp.route('/<int:user_id>/add_score')
@@ -34,4 +34,4 @@ def add_score(user_id):
     flash(f'Добавлено {score} очков игроку "{user.name}"')
     db.session.commit()
 
-    return redirect(url_for('dashboard.index'))
+    return redirect(url_for('rating.index'))
