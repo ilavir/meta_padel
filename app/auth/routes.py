@@ -89,7 +89,10 @@ def register():
 @bp.route('/profile')
 @login_required
 def profile():
-    return render_template('auth/profile.html', title='Профиль', user=current_user)
+    scores = current_user.scores
+    scores = sorted(scores, key=lambda score: score.created_at, reverse=True)
+
+    return render_template('auth/profile.html', title='Профиль', user=current_user, scores=scores)
 
 
 @bp.route('/profile/edit', methods=['GET', 'POST'])

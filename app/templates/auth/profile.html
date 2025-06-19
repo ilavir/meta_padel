@@ -24,5 +24,39 @@
             {% if user.last_seen %}<strong>Последний визит</strong>: {{ user.last_seen }}{% endif %}</p>
         </div>
     </div>
+    {% if scores %}
+    <div class="row mb-2">
+        <div class="col">
+            <h2 class="text-center mb-2">История начисления очков</h2>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col">
+
+            <div class="table-responsive">
+                <table class="table table-sm table-hover">
+                    <thead>
+                        <tr>
+                            <th scope="col" class="col-1">Дата</th>
+                            <th scope="col">Комментарий</th>
+                            <th scope="col" class="text-end">Очки</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for score in scores %}
+                        <tr>
+                            <td scope="row">{{ score.created_at.strftime('%Y-%m-%d') }}</td>
+                            <td>{{ score.comment }}</td>
+                            <td class="text-end">{{ score.score }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+
+        </div>
+    </div>
+    {% endif %}
 </div>
 {% endblock %}
