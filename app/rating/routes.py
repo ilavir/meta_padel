@@ -13,11 +13,18 @@ logger = logging.getLogger(__name__)
 
 @bp.route('/')
 def index():
-    users = db.session.scalars(sa.select(User).where(User.active)).all()
+    gender = request.args.get('gender', None)
+
+    # make users list for rating: 'male', 'female' or 'all'
+    if gender:
+        users = db.session.scalars(sa.select(User).where(User.active, User.gender == gender)).all()
+    else:
+        users = db.session.scalars(sa.select(User).where(User.active)).all()
+
     players = [user for user in users if user.has_role('player')]
     players = sorted(players, key=lambda user: user.total_score, reverse=True)
 
-    return render_template('rating/index.html', title='Рейтинг игроков', players=players)
+    return render_template('rating/index.html', title='Рейтинг игроков', gender=gender, players=players)
 
 
 @bp.route('/<int:user_id>/add_score')

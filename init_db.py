@@ -6,7 +6,7 @@ import argparse
 import sqlalchemy as sa
 from app import create_app, db
 from app.models import User, Role
-from config import ProductionConfig, DevelopmentConfig, TestingConfig
+from config import DevelopmentConfig
 
 # Initialize Flask app
 app = create_app(config_class=DevelopmentConfig)

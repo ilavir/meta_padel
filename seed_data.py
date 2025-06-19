@@ -8,9 +8,10 @@ from faker import Faker
 import sqlalchemy as sa
 from app import create_app, db
 from app.models import User, Role, Score
+from config import DevelopmentConfig
 
 # Initialize Flask app and Faker
-app = create_app()
+app = create_app(config_class=DevelopmentConfig)
 fake = Faker()
 
 # Number of test records to create
@@ -56,6 +57,7 @@ def create_users(roles):
             name=fake.name(),
             phone=fake.phone_number(),
             gender=random.choice(["male", "female"]),
+            about_me=fake.text(max_nb_chars=200),
             active=random.choice([True, False])
         )
         user.set_password("password123")
@@ -103,9 +105,16 @@ def seed_database():
     """Main function to seed the database with test data"""
     print("Starting database seeding...")
 
-    # Check if data already exists
-    if db.session.scalar(db.select(User).limit(1)):
-        print("Database already contains users. Skipping seeding to avoid duplicates.")
+    # Create all database tables
+    db.create_all()
+    print("Database tables created")
+
+    # Check if non-superadmin users already exist
+    non_superadmin_users = db.session.scalars(
+        sa.select(User).join(User.roles).where(Role.name != "superadmin")
+    ).first()
+    if non_superadmin_users:
+        print("Database already contains non-superadmin users. Skipping seeding to avoid duplicates.")
         return
 
     # Create test data
