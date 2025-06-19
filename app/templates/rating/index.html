@@ -37,7 +37,7 @@
                 </thead>
                 <tbody>
                     {% for player in players %}
-                    <tr class="{{ 'table-warning' if player.id == current_user.id }}">
+                    <tr class="{{ 'table-warning' if player.user.id == current_user.id }}">
                         <th scope="row">{{ player.rank }}</th>
                         <td>
                             {% if player.rank_change is not none %}
