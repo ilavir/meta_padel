@@ -34,6 +34,7 @@
                     {% endif %}
                     {% if not current_user.is_anonymous and current_user.has_any_role(['superadmin']) %}
                     <li class="nav-item"><a href="{{ url_for('users.get_roles') }}" class="nav-link {{ 'active' if request.endpoint == 'users.get_roles' }}" {{ 'aria-current=page' if request.endpoint == 'users.get_roles' }}>Роли</a></li>
+                    <li class="nav-item"><a href="{{ url_for('rating.score_templates') }}" class="nav-link {{ 'active' if request.endpoint == 'rating.score_templates' }}" {{ 'aria-current=page' if request.endpoint == 'rating.score_templates' }}>Шаблоны очков</a></li>
                     {% endif %}
                 </ul>
                 <ul class="navbar-nav">

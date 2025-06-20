@@ -74,7 +74,7 @@ def edit_user(user_id):
 
 
 # delete User
-@bp.route('/<int:user_id>/delete', methods=['GET', 'POST'])
+@bp.route('/<int:user_id>/delete', methods=['GET'])
 @login_required
 @role_required(['superadmin', 'admin'])
 def delete_user(user_id):

@@ -166,9 +166,21 @@ class Score(db.Model):
 class ScoreTemplate(BaseModel):
     __tablename__ = 'score_templates'
 
-    name: so.Mapped[str] = so.mapped_column(sa.String(128))
+    name: so.Mapped[str] = so.mapped_column(sa.String(128), index=True, unique=True)
     score: so.Mapped[int] = so.mapped_column(sa.Integer)
     comment: so.Mapped[str] = so.mapped_column(sa.String(256))
 
     def __repr__(self):
         return f'<ScoreTemplate {self.name} {self.score}>'
+
+    @classmethod
+    def from_dict(cls, data):
+        instance = cls()
+        instance.update_from_dict(data)
+        return instance
+
+    def update_from_dict(self, data):
+        allowed_fields = ['name', 'score', 'comment']
+        for field in allowed_fields:
+            if field in data:
+                setattr(self, field, data[field])

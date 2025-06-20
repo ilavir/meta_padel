@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+
+{% block content %}
+<form action="" method="post" novalidate class="container my-4">
+    {{ form.hidden_tag() }}
+    <div class="row mb-3">
+        <div class="col">
+            <h1 class="text-center">{{ title }}</h1>
+        </div>
+    </div>
+    <div class="row mb-3">
+        <div class="col">
+            {{ fields.text(form.name, true, false) }}
+        </div>
+    </div>
+    <div class="row mb-3">
+        <div class="col">
+            {{ fields.text(form.score, true, false) }}
+        </div>
+    </div>
+    <div class="row mb-3">
+        <div class="col">
+            {{ fields.text(form.comment, true, false) }}
+        </div>
+    </div>
+    <div class="row mt-4">
+        <div class="col">
+            <a href="{{ url_for('rating.score_templates') }}" class="btn btn-secondary">Отменить</a>
+            {{ form.submit(class="btn btn-primary") }}
+        </div>
+        {% if action == 'edit' %}
+        <div class="col text-end">
+            <a href="{{ url_for('rating.delete_score_template', template_id=template.id) }}" class="btn btn-danger">Удалить</a>
+        </div>
+        {% endif %}
+    </div>
+</form>
+
+{% endblock %}

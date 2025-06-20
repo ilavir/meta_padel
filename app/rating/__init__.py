@@ -2,4 +2,4 @@ from flask import Blueprint
 
 bp = Blueprint('rating', __name__)
 
-from app.rating import routes
+from app.rating import rating, score_templates

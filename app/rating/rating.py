@@ -41,7 +41,7 @@ def index():
             .where(
                 UserRankHistory.user_id == user.id,
                 UserRankHistory.rank_type == rank_type,
-                sa.func.date(UserRankHistory.created_at) == yesterday
+                sa.func.date(UserRankHistory.created_at) == current_date
             )
             .order_by(UserRankHistory.created_at.desc())  # In case there are multiple for yesterday, take the latest
         ).first()
@@ -83,16 +83,19 @@ def add_score(user_id):
 def update_rankings():
     rank_type = request.args.get('rank_type', None)
     if rank_type and rank_type not in ['male', 'female', 'all']:
-        return {'success': False, 'message': 'Invalid Rank Type'}
+        logger.error(f'Invalid Rank Type: {rank_type}')
+        flash('Неверный тип рейтинга', 'error')
     elif rank_type:
         take_rank_snapshot(rank_type)
         logger.info(f'Rankings updated for {rank_type} players')
+        flash('Рейтинг обновлен', 'success')
+        return redirect(url_for('rating.index', gender=rank_type))
+
     elif not rank_type:
         take_rank_snapshot('all')
         take_rank_snapshot('male')
         take_rank_snapshot('female')
         logger.info('Rankings updated for all players')
+        flash('Рейтинг обновлен', 'success')
 
-    flash('Рейтинг обновлен', 'success')
-
-    return redirect(url_for('rating.index', gender=rank_type))
+    return redirect(url_for('rating.index'))
