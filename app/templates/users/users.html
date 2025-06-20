@@ -22,6 +22,7 @@
                             <th scope="col">Дата регистрации</th>
                             <th scope="col">Активен</th>
                             <th scope="col"></th>
+                            <th scope="col"></th>
                         </tr>
                     </thead>
                     <tbody>
@@ -44,6 +45,11 @@
                                 {% elif not user.has_any_role(['superadmin', 'admin']) %}
                                 <a href="{{ url_for('users.edit_user', user_id=user.id) }}" class="btn btn-primary btn-sm">Изменить</a>
                                 {% endif %}
+                            </td>
+                            <td>
+                                {% for template in score_templates %}
+                                <a href="{{ url_for('rating.apply_score_template', user_id=user.id, template_id=template.id) }}" class="btn btn-sm btn-success">{{ template.name }}</a>
+                                {% endfor %}
                             </td>
                         </tr>
                         {% endfor %}

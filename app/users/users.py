@@ -5,7 +5,7 @@ from . import bp
 from .forms import UserAddEditForm
 import sqlalchemy as sa
 from app import db
-from app.models import User, Role
+from app.models import User, Role, ScoreTemplate
 from app.services import role_required
 
 
@@ -18,8 +18,9 @@ logger = logging.getLogger(__name__)
 @role_required(['superadmin', 'admin'])
 def get_users():
     users = db.session.scalars(sa.select(User)).all()
+    score_templates = db.session.scalars(sa.select(ScoreTemplate)).all()
 
-    return render_template('users/users.html', title='Пользователи', users=users)
+    return render_template('users/users.html', title='Пользователи', users=users, score_templates=score_templates)
 
 
 # edit User

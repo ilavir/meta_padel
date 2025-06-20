@@ -6,7 +6,7 @@ from . import bp
 from .services import take_rank_snapshot
 import sqlalchemy as sa
 from app import db
-from app.models import User, UserRankHistory
+from app.models import User, UserRankHistory, Score, ScoreTemplate
 from app.services import role_required
 
 
@@ -41,7 +41,7 @@ def index():
             .where(
                 UserRankHistory.user_id == user.id,
                 UserRankHistory.rank_type == rank_type,
-                sa.func.date(UserRankHistory.created_at) == current_date
+                sa.func.date(UserRankHistory.created_at) == yesterday
             )
             .order_by(UserRankHistory.created_at.desc())  # In case there are multiple for yesterday, take the latest
         ).first()
@@ -60,21 +60,21 @@ def index():
     return render_template('rating/index.html', title='Рейтинг игроков', gender=gender, players=ranked_players)
 
 
-@bp.route('/<int:user_id>/add_score')
-@login_required
-@role_required(['superadmin', 'admin'])
-def add_score(user_id):
-    user = db.get_or_404(User, user_id)
+# @bp.route('/<int:user_id>/add_score')
+# @login_required
+# @role_required(['superadmin', 'admin'])
+# def add_score(user_id):
+#     user = db.get_or_404(User, user_id)
 
-    score = request.args.get('score', None)
-    comment = request.args.get('comment', None)
+#     score = request.args.get('score', None)
+#     comment = request.args.get('comment', None)
 
-    user.add_score(score, comment)
-    logger.info(f'Added score {score} for user "{user.email}" by {current_user.email}')
-    flash(f'Добавлено {score} очков игроку "{user.name}"')
-    db.session.commit()
+#     user.add_score(score, comment)
+#     logger.info(f'Added score {score} for user "{user.email}" by {current_user.email}')
+#     flash(f'Добавлено {score} очков игроку "{user.name}"')
+#     db.session.commit()
 
-    return redirect(url_for('rating.index'))
+#     return redirect(url_for('rating.index'))
 
 
 @bp.route('/update-rankings')
@@ -99,3 +99,45 @@ def update_rankings():
         flash('Рейтинг обновлен', 'success')
 
     return redirect(url_for('rating.index'))
+
+
+@bp.route('/apply-score-template', methods=['GET'])
+@login_required
+@role_required(['superadmin', 'admin'])
+def apply_score_template():
+    """Apply score template to user (AJAX endpoint)"""
+
+    template_id = request.args.get('template_id')
+    user_id = request.args.get('user_id')
+
+    if not template_id or not user_id:
+        logger.error('Apply score template: missing template_id or user_id')
+        return {'success': False, 'message': 'Missing template_id or user_id'}, 400
+
+    template = db.session.get(ScoreTemplate, template_id)
+    user = db.session.get(User, user_id)
+
+    if not template or not user:
+        logger.error(f'Apply score template: template [{template_id}] or user [{user_id}] not found')
+        return {'success': False, 'message': 'Template or user not found'}, 404
+
+    # Create new score
+    score = Score(
+        user_id=user_id,
+        score=template.score,
+        comment=template.comment,
+        created_by=current_user.id
+    )
+    db.session.add(score)
+    db.session.commit()
+
+    logger.info(f'Applied score template "{template.name}" ({template.score} points) '
+                f'to user "{user.email}" by {current_user.email}')
+    flash(f'Добавлено {template.score} очков игроку "{user.name}"')
+
+    # Update rankings
+    take_rank_snapshot('all')
+    if user.gender:
+        take_rank_snapshot(user.gender)
+
+    return redirect(url_for('users.get_users'))

@@ -32,6 +32,7 @@
                         <td>{{ template.comment }}</td>
                         <td class="text-end">{{ template.score }}</td>
                         <td>
+                            <i class="fas fa-edit"></i>
                             <a href="{{ url_for('rating.edit_score_template', template_id=template.id) }}" class="btn btn-primary btn-sm">Изменить</a>
                         </td>
                     </tr>
