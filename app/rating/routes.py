@@ -1,11 +1,12 @@
 import logging
-from datetime import datetime, timezone
+from datetime import datetime, timezone, timedelta
 from flask import render_template, request, redirect, url_for, flash
 from flask_login import login_required, current_user
 from . import bp
+from .services import take_rank_snapshot
 import sqlalchemy as sa
 from app import db
-from app.models import User
+from app.models import User, UserRankHistory
 from app.services import role_required
 
 
@@ -17,20 +18,38 @@ def index():
     gender = request.args.get('gender', None)
 
     # make users list for rating: 'male', 'female' or 'all'
-    if gender:
-        users = db.session.scalars(sa.select(User).where(User.active, User.gender == gender)).all()
+    if gender in ['male', 'female']:
+        rank_type = gender
+        users_query = sa.select(User).where(User.active, User.gender == gender)
     else:
-        users = db.session.scalars(sa.select(User).where(User.active)).all()
+        rank_type = 'all'
+        users_query = sa.select(User).where(User.active)
 
+    users = db.session.scalars(users_query).all()
     players = [user for user in users if user.has_role('player')]
     players = sorted(players, key=lambda user: user.total_score, reverse=True)
 
     # Assign current rank and calculate rank change
     ranked_players = []
+    current_date = datetime.now(timezone.utc).date()
+    yesterday = current_date - timedelta(days=1)
+
     for idx, user in enumerate(players, start=1):
+        # Get the previous day's rank from RankHistory
+        previous_rank_entry = db.session.scalars(
+            sa.select(UserRankHistory)
+            .where(
+                UserRankHistory.user_id == user.id,
+                UserRankHistory.rank_type == rank_type,
+                sa.func.date(UserRankHistory.created_at) == yesterday
+            )
+            .order_by(UserRankHistory.created_at.desc())  # In case there are multiple for yesterday, take the latest
+        ).first()
+        previous_rank = previous_rank_entry.rank if previous_rank_entry else None
+
         rank_change = None
-        if user.last_rank is not None:
-            rank_change = user.last_rank - idx
+        if previous_rank is not None:
+            rank_change = previous_rank - idx  # Positive if moved up, negative if moved down
 
         ranked_players.append({
             'rank': idx,
@@ -60,13 +79,11 @@ def add_score(user_id):
 
 @bp.route('/_update_ranks')
 def update_ranks():
-    users = db.session.scalars(sa.select(User).where(User.active)).all()
-    players = [user for user in users if user.has_role('player')]
-    players = sorted(players, key=lambda user: user.total_score, reverse=True)
-
-    for idx, player in enumerate(players, start=1):
-        player.last_rank = idx
-
-    db.session.commit()
+    try:
+        take_rank_snapshot('all')
+        take_rank_snapshot('male')
+        take_rank_snapshot('female')
+    except Exception as e:
+        logger.error(f"Error taking rank snapshots: {e}")
 
     return {'success': True, 'message': 'Ranks updated successfully', 'date': datetime.now(timezone.utc)}

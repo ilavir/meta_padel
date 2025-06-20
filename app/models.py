@@ -30,10 +30,10 @@ class User(UserMixin, BaseModel):
     password_hash: so.Mapped[Optional[str]] = so.mapped_column(sa.String(256))
     active: so.Mapped[bool] = so.mapped_column(sa.Boolean, default=False)
     last_seen: so.Mapped[Optional[datetime]] = so.mapped_column(sa.DateTime, default=None)
-    last_rank: so.Mapped[Optional[int]] = so.mapped_column(sa.Integer, default=None)
 
     roles: so.Mapped[list['Role']] = so.relationship(secondary='user_roles', back_populates='users')
     scores: so.Mapped[list['Score']] = so.relationship(back_populates='user', passive_deletes=True)
+    rank_history: so.Mapped[list['UserRankHistory']] = so.relationship(back_populates='user', passive_deletes=True)
 
     @property
     def total_score(self):
@@ -142,3 +142,18 @@ class Score(db.Model):
 
     def __repr__(self):
         return f'<Score {self.user_id} {self.score}>'
+
+
+class UserRankHistory(db.Model):
+    __tablename__ = 'user_rank_history'
+
+    id: so.Mapped[int] = so.mapped_column(primary_key=True)
+    user_id: so.Mapped[int] = so.mapped_column(sa.ForeignKey('users.id'), index=True)
+    rank_type: so.Mapped[str] = so.mapped_column(sa.String(32), index=True)
+    rank: so.Mapped[int] = so.mapped_column(sa.Integer)
+    created_at: so.Mapped[datetime] = so.mapped_column(sa.DateTime, server_default=sa.func.now())
+
+    user: so.Mapped[User] = so.relationship(back_populates='rank_history')
+
+    def __repr__(self):
+        return f'<RankHistory {self.user_id} {self.rank}>'
