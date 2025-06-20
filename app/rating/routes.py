@@ -77,13 +77,22 @@ def add_score(user_id):
     return redirect(url_for('rating.index'))
 
 
-@bp.route('/_update_ranks')
-def update_ranks():
-    try:
+@bp.route('/update-rankings')
+@login_required
+@role_required(['superadmin', 'admin'])
+def update_rankings():
+    rank_type = request.args.get('rank_type', None)
+    if rank_type and rank_type not in ['male', 'female', 'all']:
+        return {'success': False, 'message': 'Invalid Rank Type'}
+    elif rank_type:
+        take_rank_snapshot(rank_type)
+        logger.info(f'Rankings updated for {rank_type} players')
+    elif not rank_type:
         take_rank_snapshot('all')
         take_rank_snapshot('male')
         take_rank_snapshot('female')
-    except Exception as e:
-        logger.error(f"Error taking rank snapshots: {e}")
+        logger.info('Rankings updated for all players')
 
-    return {'success': True, 'message': 'Ranks updated successfully', 'date': datetime.now(timezone.utc)}
+    flash('Рейтинг обновлен', 'success')
+
+    return redirect(url_for('rating.index', gender=rank_type))

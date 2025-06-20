@@ -87,11 +87,14 @@ def create_scores(users):
             score_value = random.randint(1, 100)
             # Random date within the last 30 days
             score_date = now - timedelta(days=random.randint(0, 30))
+            # Random user as creator (could be the same user or different)
+            creator = random.choice(users)
 
             score = Score(
                 user_id=user.id,
                 score=score_value,
                 comment=fake.sentence(),
+                created_by=creator.id,
                 created_at=score_date
             )
             db.session.add(score)

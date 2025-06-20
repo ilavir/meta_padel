@@ -32,7 +32,8 @@ class User(UserMixin, BaseModel):
     last_seen: so.Mapped[Optional[datetime]] = so.mapped_column(sa.DateTime, default=None)
 
     roles: so.Mapped[list['Role']] = so.relationship(secondary='user_roles', back_populates='users')
-    scores: so.Mapped[list['Score']] = so.relationship(back_populates='user', passive_deletes=True)
+    scores: so.Mapped[list['Score']] = so.relationship(foreign_keys='Score.user_id',
+                                                       back_populates='user', passive_deletes=True)
     rank_history: so.Mapped[list['UserRankHistory']] = so.relationship(back_populates='user', passive_deletes=True)
 
     @property
@@ -129,21 +130,6 @@ class UserRole(db.Model):
     granted_at: so.Mapped[datetime] = so.mapped_column(sa.DateTime, server_default=sa.func.now())
 
 
-class Score(db.Model):
-    __tablename__ = 'scores'
-
-    id: so.Mapped[int] = so.mapped_column(primary_key=True)
-    user_id: so.Mapped[int] = so.mapped_column(sa.ForeignKey('users.id'), index=True)
-    score: so.Mapped[int] = so.mapped_column(sa.Integer)
-    comment: so.Mapped[str] = so.mapped_column(sa.String(256))
-    created_at: so.Mapped[datetime] = so.mapped_column(sa.DateTime, server_default=sa.func.now())
-
-    user: so.Mapped[User] = so.relationship(back_populates='scores')
-
-    def __repr__(self):
-        return f'<Score {self.user_id} {self.score}>'
-
-
 class UserRankHistory(db.Model):
     __tablename__ = 'user_rank_history'
 
@@ -157,3 +143,32 @@ class UserRankHistory(db.Model):
 
     def __repr__(self):
         return f'<RankHistory {self.user_id} {self.rank}>'
+
+
+class Score(db.Model):
+    __tablename__ = 'scores'
+
+    id: so.Mapped[int] = so.mapped_column(primary_key=True)
+    user_id: so.Mapped[int] = so.mapped_column(sa.ForeignKey('users.id'), index=True)
+    score: so.Mapped[int] = so.mapped_column(sa.Integer)
+    comment: so.Mapped[str] = so.mapped_column(sa.String(256))
+    created_by: so.Mapped[int] = so.mapped_column(sa.ForeignKey('users.id', name='fk_scores_created_by'))
+    created_at: so.Mapped[datetime] = so.mapped_column(sa.DateTime, server_default=sa.func.now())
+
+    # Relationships
+    user: so.Mapped[User] = so.relationship(foreign_keys=[user_id], back_populates='scores')
+    creator: so.Mapped[User] = so.relationship(foreign_keys=[created_by])
+
+    def __repr__(self):
+        return f'<Score {self.user_id} {self.score}>'
+
+
+class ScoreTemplate(BaseModel):
+    __tablename__ = 'score_templates'
+
+    name: so.Mapped[str] = so.mapped_column(sa.String(128))
+    score: so.Mapped[int] = so.mapped_column(sa.Integer)
+    comment: so.Mapped[str] = so.mapped_column(sa.String(256))
+
+    def __repr__(self):
+        return f'<ScoreTemplate {self.name} {self.score}>'
