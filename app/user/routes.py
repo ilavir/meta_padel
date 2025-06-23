@@ -72,10 +72,8 @@ def register():
     if form.validate_on_submit():
         logger.debug(f'Registration form submitted. Email: {form.email.data}')
 
-        # # check if there are users in DB
-        # existing_user = db.session.scalar(sa.select(User))
-
         user = User.from_dict(form.data)
+        user.username = form.email.data.split('@')[0][:64]
         user.roles.append(db.session.scalar(sa.select(Role).where(Role.name == 'player')))
         db.session.add(user)
         db.session.commit()

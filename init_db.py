@@ -9,7 +9,7 @@ from app.models import User, Role
 from config import DevelopmentConfig
 
 # Initialize Flask app
-app = create_app()
+app = create_app(config_class=DevelopmentConfig)
 
 
 def create_roles():
@@ -39,7 +39,7 @@ def create_roles():
     return created_roles
 
 
-def create_superadmin(email, password, name="Super Admin", phone="", gender="male"):
+def create_superadmin(email, password, username=None, name="Super Admin", phone="", gender="male"):
     """Create a superadmin user if it doesn't exist"""
     # Check if user already exists
     existing_user = db.session.scalar(sa.select(User).where(User.email == email))
@@ -47,8 +47,13 @@ def create_superadmin(email, password, name="Super Admin", phone="", gender="mal
         print(f"User '{email}' already exists")
         return existing_user
 
+    # Generate username from email if not provided
+    if not username:
+        username = email.split('@')[0]
+
     # Create superadmin user
     user = User(
+        username=username,
         email=email,
         name=name,
         phone=phone,
@@ -68,7 +73,7 @@ def create_superadmin(email, password, name="Super Admin", phone="", gender="mal
     return user
 
 
-def init_database(create_admin=False, email=None, password=None):
+def init_database(create_admin=False, email=None, password=None, username=None):
     """Initialize the database with required roles and optionally a superadmin user"""
     print("Starting database initialization...")
 
@@ -80,7 +85,7 @@ def init_database(create_admin=False, email=None, password=None):
         if not all([email, password]):
             print("Error: email, and password are required to create a superadmin user")
             return
-        create_superadmin(email, password)
+        create_superadmin(email, password, username)
 
     print("Database initialization completed successfully!")
 
@@ -90,6 +95,7 @@ if __name__ == "__main__":
     parser.add_argument("--create-admin", action="store_true", help="Create a superadmin user")
     parser.add_argument("--email", help="Email for the superadmin user")
     parser.add_argument("--password", help="Password for the superadmin user")
+    parser.add_argument("--username", help="Username for the superadmin user (defaults to email prefix)")
     parser.add_argument("--name", default="Super Admin", help="Name for the superadmin user")
     parser.add_argument("--phone", default="", help="Phone number for the superadmin user")
 
@@ -100,7 +106,8 @@ if __name__ == "__main__":
             init_database(
                 create_admin=True,
                 email=args.email,
-                password=args.password
+                password=args.password,
+                username=args.username
             )
         else:
             init_database()

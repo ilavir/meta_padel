@@ -22,6 +22,7 @@ class BaseModel(db.Model):
 class User(UserMixin, BaseModel):
     __tablename__ = 'users'
 
+    username: so.Mapped[str] = so.mapped_column(sa.String(64), index=True, unique=True)
     email: so.Mapped[str] = so.mapped_column(sa.String(128), index=True, unique=True)
     name: so.Mapped[str] = so.mapped_column(sa.String(128))
     phone: so.Mapped[str] = so.mapped_column(sa.String(32))
@@ -41,7 +42,7 @@ class User(UserMixin, BaseModel):
         return sum(score.score for score in self.scores)
 
     def __repr__(self):
-        return f'<User {self.email}>'
+        return f'<User {self.username}>'
 
     @classmethod
     def from_dict(cls, data):
@@ -50,7 +51,7 @@ class User(UserMixin, BaseModel):
         return instance
 
     def update_from_dict(self, data):
-        allowed_fields = ['email', 'name', 'phone', 'gender', 'active', 'about_me']
+        allowed_fields = ['username', 'email', 'name', 'phone', 'gender', 'active', 'about_me']
         for field in allowed_fields:
             if field in data:
                 setattr(self, field, data[field])
