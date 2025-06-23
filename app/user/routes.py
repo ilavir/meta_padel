@@ -34,12 +34,12 @@ def login():
         # check for user/password
         if user is None or not user.check_password(form.password.data):
             flash('Неверный адрес электронной почты или пароль', 'error')
-            return redirect(url_for('auth.login'))
+            return redirect(url_for('user.login'))
 
         # check if user active
         if not user.active:
             flash('Пользователь отключён', 'error')
-            return redirect(url_for('auth.login'))
+            return redirect(url_for('user.login'))
 
         login_user(user, remember=form.remember_me.data)
         logger.debug(f'User {user.email} logged in')
@@ -50,7 +50,7 @@ def login():
 
         return redirect(next_page)
 
-    return render_template('auth/login.html', title='Вход', form=form)
+    return render_template('user/login.html', title='Вход', form=form)
 
 
 @bp.route('/logout')
@@ -59,7 +59,7 @@ def logout():
 
     logout_user()
     flash('Вы вышли из системы')
-    return redirect(url_for('auth.login'))
+    return redirect(url_for('user.login'))
 
 
 @bp.route('/register', methods=['GET', 'POST'])
@@ -81,9 +81,9 @@ def register():
         db.session.commit()
 
         flash('Вы успешно зарегистрированы')
-        return redirect(url_for('auth.login'))
+        return redirect(url_for('user.login'))
 
-    return render_template('auth/register.html', title='Регистрация', form=form)
+    return render_template('user/register.html', title='Регистрация', form=form)
 
 
 @bp.route('/profile')
@@ -92,7 +92,7 @@ def profile():
     scores = current_user.scores
     scores = sorted(scores, key=lambda score: score.created_at, reverse=True)
 
-    return render_template('auth/profile.html', title='Профиль', user=current_user, scores=scores)
+    return render_template('user/profile.html', title='Профиль', user=current_user, scores=scores)
 
 
 @bp.route('/profile/edit', methods=['GET', 'POST'])
@@ -107,6 +107,6 @@ def edit_profile():
         db.session.commit()
 
         flash('Профиль обновлён')
-        return redirect(url_for('auth.profile'))
+        return redirect(url_for('user.profile'))
 
-    return render_template('auth/edit_profile.html', title='Редактирование профиля', form=form)
+    return render_template('user/edit_profile.html', title='Редактирование профиля', form=form)

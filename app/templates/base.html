@@ -39,14 +39,14 @@
                 </ul>
                 <ul class="navbar-nav">
                     {% if current_user.is_anonymous %}
-                    <li class="nav-item"><a href="{{ url_for('auth.login') }}" class="nav-link">Вход</a></li>
+                    <li class="nav-item"><a href="{{ url_for('user.login') }}" class="nav-link">Вход</a></li>
                     {% else %}
                     <li class="nav-item dropdown">
                         <a href="#" class="nav-link dropdown-toggle" role="button" data-bs-toggle="dropdown" aria-expanded="false">{{ current_user.name }}</a>
                         <ul class="dropdown-menu">
-                            <li><a href="{{ url_for('auth.profile') }}" class="dropdown-item">Профиль</a></li>
+                            <li><a href="{{ url_for('user.profile') }}" class="dropdown-item">Профиль</a></li>
                             <li><hr class="dropdown-divider"></li>
-                            <li><a href="{{ url_for('auth.logout') }}" class="dropdown-item">Выход</a></li>
+                            <li><a href="{{ url_for('user.logout') }}" class="dropdown-item">Выход</a></li>
                         </ul>
                     </li>
                     {% endif %}

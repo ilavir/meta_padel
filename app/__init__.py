@@ -19,13 +19,13 @@ def register_extensions(app):
     db.init_app(app)
     migrate.init_app(app, db)
     login.init_app(app)
-    login.login_view = 'auth.login'
+    login.login_view = 'user.login'
     login.login_message = u"Пожалуйста, войдите в систему, чтобы получить доступ к этой странице."
 
 
 def register_blueprints(app):
-    from app.auth import bp as auth_bp
-    app.register_blueprint(auth_bp)
+    from app.user import bp as user_bp
+    app.register_blueprint(user_bp, url_prefix='/user')
 
     from app.rating import bp as rating_bp
     app.register_blueprint(rating_bp)
