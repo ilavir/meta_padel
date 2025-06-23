@@ -9,7 +9,8 @@ from app.models import User, Role
 from config import DevelopmentConfig
 
 # Initialize Flask app
-app = create_app(config_class=DevelopmentConfig)
+# app = create_app(config_class=DevelopmentConfig)
+app = create_app()
 
 
 def create_roles():

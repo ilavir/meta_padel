@@ -11,8 +11,8 @@ from app.models import User, Role, Score
 from config import DevelopmentConfig
 
 # Initialize Flask app and Faker
-app = create_app(config_class=DevelopmentConfig)
-# app = create_app()
+# app = create_app(config_class=DevelopmentConfig)
+app = create_app()
 fake = Faker()
 
 # Number of test records to create
