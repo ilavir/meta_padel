@@ -4,6 +4,7 @@ from flask import render_template, request, redirect, url_for, flash
 from flask_login import login_required, current_user
 from . import bp
 from .services import take_rank_snapshot
+from .forms import ApplyScoreTemplateForm
 import sqlalchemy as sa
 from app import db
 from app.models import User, UserRankHistory, Score, ScoreTemplate
@@ -101,43 +102,47 @@ def update_rankings():
     return redirect(url_for('rating.index'))
 
 
-@bp.route('/apply-score-template', methods=['GET'])
+@bp.route('/apply-score-template', methods=['POST'])
 @login_required
 @role_required(['superadmin', 'admin'])
 def apply_score_template():
-    """Apply score template to user (AJAX endpoint)"""
+    """Apply score template to user"""
 
-    template_id = request.args.get('template_id')
-    user_id = request.args.get('user_id')
+    apply_score_form = ApplyScoreTemplateForm()
+    logger.debug(f'Apply score template form submitted. Data: {request.form}')
 
-    if not template_id or not user_id:
-        logger.error('Apply score template: missing template_id or user_id')
-        return {'success': False, 'message': 'Missing template_id or user_id'}, 400
+    if apply_score_form.validate_on_submit():
+        template_id = request.form.get('template_id')
+        user_id = request.form.get('user_id')
 
-    template = db.session.get(ScoreTemplate, template_id)
-    user = db.session.get(User, user_id)
+        if not template_id or not user_id:
+            flash('Ошибка: отсутствуют данные', 'error')
+            return redirect(request.referrer or url_for('rating.index'))
 
-    if not template or not user:
-        logger.error(f'Apply score template: template [{template_id}] or user [{user_id}] not found')
-        return {'success': False, 'message': 'Template or user not found'}, 404
+        template = db.session.get(ScoreTemplate, template_id)
+        user = db.session.get(User, user_id)
 
-    # Create new score
-    score = Score(
-        user_id=user_id,
-        score=template.score,
-        comment=template.comment,
-        created_by=current_user.id
-    )
-    db.session.add(score)
-    db.session.commit()
+        if not template or not user:
+            flash('Ошибка: шаблон или пользователь не найден', 'error')
+            return redirect(request.referrer or url_for('rating.index'))
 
-    logger.info(f'Applied score template "{template.name}" ({template.score} points) '
-                f'to user "{user.email}" by {current_user.email}')
-    flash(f'Добавлено {template.score} очков игроку "{user.name}"')
+        # Create new score
+        score = Score(
+            user_id=user_id,
+            score=template.score,
+            comment=template.comment,
+            created_by=current_user.id
+        )
+        db.session.add(score)
+        db.session.commit()
 
-    # Update rankings
-    take_rank_snapshot('all')
-    if user.gender:
-        take_rank_snapshot(user.gender)
+        logger.info(f'Applied score template "{template.name}" ({template.score} points) '
+                    f'to user "{user.email}" by {current_user.email}')
+        flash(f'Добавлено {template.score} очков игроку "{user.name}"')
 
-    return redirect(url_for('users.get_users'))
+        # Update rankings
+        take_rank_snapshot('all')
+        if user.gender:
+            take_rank_snapshot(user.gender)
+
+    return redirect(url_for('user.profile', username=user.username))

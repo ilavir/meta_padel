@@ -18,3 +18,7 @@ class ScoreTemplateForm(FlaskForm):
         DataRequired(message='Обязательное поле'),
         Length(max=COMMENT_MAX_LENGTH, message=f'Поле не может содержать более {COMMENT_MAX_LENGTH} символов')])
     submit = SubmitField('Сохранить')
+
+
+class ApplyScoreTemplateForm(FlaskForm):
+    submit = SubmitField('Применить')

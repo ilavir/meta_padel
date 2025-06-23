@@ -27,6 +27,22 @@
             {% if user.last_seen %}<strong>Последний визит</strong>: {{ user.last_seen }}{% endif %}</p>
         </div>
     </div>
+
+    <form id="scoreForm" method="POST" action="{{ url_for('rating.apply_score_template') }}">
+        {{ apply_score_form.hidden_tag() }}
+        <input type="hidden" name="user_id" value="{{ user.id }}">
+        <input type="hidden" name="template_id" id="templateId">
+        <div class="d-flex flex-wrap gap-2 mb-3">
+            {% for template in score_templates %}
+            <button type="submit" class="btn btn-success d-flex align-items-center gap-2" onclick="submitTemplate({{ template.id }})">
+                <i class="bi bi-plus-circle"></i>
+                <span>{{ template.comment }}</span>
+                <span class="badge bg-light text-dark">{{ template.score }} очков</span>
+            </button>
+            {% endfor %}
+        </div>
+    </form>
+
     {% if scores %}
     <div class="row mb-2">
         <div class="col">
@@ -62,4 +78,14 @@
     </div>
     {% endif %}
 </div>
+{% endblock %}
+
+{% block js %}
+{{ super() }}
+<script>
+    function submitTemplate(templateId) {
+        document.getElementById('templateId').value = templateId;
+        document.getElementById('scoreForm').submit();
+    }
+</script>
 {% endblock %}

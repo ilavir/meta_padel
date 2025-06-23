@@ -6,7 +6,8 @@ from . import bp
 from .forms import LoginForm, RegistrationForm, EditProfileForm
 import sqlalchemy as sa
 from app import db
-from app.models import User, Role
+from app.models import User, Role, ScoreTemplate
+from app.rating.forms import ApplyScoreTemplateForm
 
 
 logger = logging.getLogger(__name__)
@@ -95,7 +96,12 @@ def profile(username):
     scores = user.scores
     scores = sorted(scores, key=lambda score: score.created_at, reverse=True)
 
-    return render_template('user/profile.html', title='Профиль', user=user, scores=scores)
+    score_templates = db.session.scalars(sa.select(ScoreTemplate)).all()
+    apply_score_form = ApplyScoreTemplateForm()
+
+    return render_template('user/profile.html', title='Профиль',
+                           user=user, scores=scores,
+                           score_templates=score_templates, apply_score_form=apply_score_form)
 
 
 @bp.route('/me')
