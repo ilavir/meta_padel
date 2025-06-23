@@ -28,6 +28,7 @@
         </div>
     </div>
 
+    {% if current_user.has_any_role(['superadmin', 'admin']) %}
     <form id="scoreForm" method="POST" action="{{ url_for('rating.apply_score_template') }}">
         {{ apply_score_form.hidden_tag() }}
         <input type="hidden" name="user_id" value="{{ user.id }}">
@@ -42,6 +43,7 @@
             {% endfor %}
         </div>
     </form>
+    {% endif %}
 
     {% if scores %}
     <div class="row mb-2">
