@@ -44,7 +44,7 @@
                     <li class="nav-item dropdown">
                         <a href="#" class="nav-link dropdown-toggle" role="button" data-bs-toggle="dropdown" aria-expanded="false">{{ current_user.name }}</a>
                         <ul class="dropdown-menu">
-                            <li><a href="{{ url_for('user.profile') }}" class="dropdown-item">Профиль</a></li>
+                            <li><a href="{{ url_for('user.my_profile') }}" class="dropdown-item">Профиль</a></li>
                             <li><hr class="dropdown-divider"></li>
                             <li><a href="{{ url_for('user.logout') }}" class="dropdown-item">Выход</a></li>
                         </ul>

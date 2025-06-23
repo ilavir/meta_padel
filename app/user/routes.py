@@ -86,9 +86,9 @@ def register():
     return render_template('user/register.html', title='Регистрация', form=form)
 
 
-@bp.route('/profile')
+@bp.route('/me')
 @login_required
-def profile():
+def my_profile():
     scores = current_user.scores
     scores = sorted(scores, key=lambda score: score.created_at, reverse=True)
 
@@ -107,6 +107,6 @@ def edit_profile():
         db.session.commit()
 
         flash('Профиль обновлён')
-        return redirect(url_for('user.profile'))
+        return redirect(url_for('user.my_profile'))
 
     return render_template('user/edit_profile.html', title='Редактирование профиля', form=form)
