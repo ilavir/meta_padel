@@ -52,7 +52,7 @@
                                 <span class="text-muted">–</span>
                             {% endif %}
                         </td>
-                        <td>{{ player.user.name }}</td>
+                        <td><a href="{{ url_for('user.profile', username=player.user.username) }}">{{ player.user.name }}</a></td>
                         <td class="text-end">{{ player.user.total_score }}</td>
                     </tr>
                     {% endfor %}

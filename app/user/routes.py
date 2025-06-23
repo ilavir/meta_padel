@@ -84,6 +84,20 @@ def register():
     return render_template('user/register.html', title='Регистрация', form=form)
 
 
+@bp.route('/<string:username>')
+@login_required
+def profile(username):
+    user = db.session.scalar(sa.select(User).where(User.username == username))
+    if user is None:
+        flash('Пользователь не найден', 'error')
+        return redirect(url_for('rating.index'))
+
+    scores = user.scores
+    scores = sorted(scores, key=lambda score: score.created_at, reverse=True)
+
+    return render_template('user/profile.html', title='Профиль', user=user, scores=scores)
+
+
 @bp.route('/me')
 @login_required
 def my_profile():
@@ -93,7 +107,7 @@ def my_profile():
     return render_template('user/profile.html', title='Профиль', user=current_user, scores=scores)
 
 
-@bp.route('/profile/edit', methods=['GET', 'POST'])
+@bp.route('/me/edit', methods=['GET', 'POST'])
 @login_required
 def edit_profile():
     form = EditProfileForm(obj=current_user)

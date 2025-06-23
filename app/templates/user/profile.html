@@ -7,14 +7,17 @@
             <h1 class="text-center">{{ title }}</h1>
         </div>
     </div>
+    {% if user.id == current_user.id %}
     <div class="row mb-3">
         <div class="col">
             <a href="{{ url_for('user.edit_profile') }}" class="btn btn-primary">Редактировать профиль</a>
         </div>
     </div>
+    {% endif %}
     <div class="row">
         <div class="col">
-            <p><strong>Email</strong>: {{ user.email }}<br>
+            <p><strong>Логин</strong>: {{ user.username }}<br>
+            <strong>Email</strong>: {{ user.email }}<br>
             <strong>Имя</strong>: {{ user.name }}<br>
             <strong>Пол</strong>: {{ 'Мужской' if user.gender == 'male' else 'Женский' if user.gender == 'female' else '' }}<br>
             <strong>Телефон</strong>: {{ user.phone }}</p>

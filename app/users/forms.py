@@ -27,12 +27,16 @@ class MultiCheckboxField(SelectMultipleField):
 
 
 class UserAddEditForm(FlaskForm):
+    USERNAME_MAX_LENGTH = 64
     EMAIL_MAX_LENGTH = 120
     # PASSWORD_MAX_LENGTH = 30
     NAME_MAX_LENGTH = 120
     PHONE_MAX_LENGTH = 30
     ABOUT_ME_MAX_LENGTH = 250
 
+    username = StringField('Логин', validators=[
+        DataRequired(message='Обязательное поле'),
+        Length(max=NAME_MAX_LENGTH, message=f'Поле не может содержать более {USERNAME_MAX_LENGTH} символов')])
     email: EmailField = EmailField('Email', validators=[
         DataRequired(message='Обязательное поле'),
         Length(max=EMAIL_MAX_LENGTH, message=f'Поле не может содержать более {EMAIL_MAX_LENGTH} символов'),
