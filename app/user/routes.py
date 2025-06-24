@@ -94,7 +94,7 @@ def profile(username):
         return redirect(url_for('rating.index'))
 
     scores = user.scores
-    scores = sorted(scores, key=lambda score: score.created_at, reverse=True)
+    scores = sorted(scores, key=lambda score: score.created_at, reverse=True)[:10]
 
     score_templates = db.session.scalars(sa.select(ScoreTemplate)).all()
     apply_score_form = ApplyScoreTemplateForm()
@@ -108,7 +108,7 @@ def profile(username):
 @login_required
 def my_profile():
     scores = current_user.scores
-    scores = sorted(scores, key=lambda score: score.created_at, reverse=True)
+    scores = sorted(scores, key=lambda score: score.created_at, reverse=True)[:20]
 
     score_templates = db.session.scalars(sa.select(ScoreTemplate)).all()
     apply_score_form = ApplyScoreTemplateForm()

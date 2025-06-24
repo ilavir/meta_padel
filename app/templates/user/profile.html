@@ -7,7 +7,7 @@
             <h1 class="text-center">{{ title }}</h1>
         </div>
     </div>
-    {% if user.id == current_user.id %}
+    {% if user == current_user %}
     <div class="row mb-3">
         <div class="col">
             <a href="{{ url_for('user.edit_profile') }}" class="btn btn-primary">Редактировать профиль</a>
@@ -48,7 +48,7 @@
     {% if scores %}
     <div class="row mb-2">
         <div class="col">
-            <h2 class="text-center mb-2">История начисления очков</h2>
+            <h2 class="text-center mb-2">Последние 10 начислений</h2>
         </div>
     </div>
     <div class="row">

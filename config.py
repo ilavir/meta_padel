@@ -11,6 +11,8 @@ class Config:
     SECRET_KEY = os.environ.get('SECRET_KEY')
     SESSION_COOKIE_NAME = os.environ.get('SESSION_COOKIE_NAME')
 
+    SENTRY_FLASK_DSN = os.environ.get('SENTRY_FLASK_DSN')
+
 
 class ProductionConfig(Config):
     DB_HOST = os.environ.get('DATABASE_HOST')

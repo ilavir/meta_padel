@@ -6,6 +6,7 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 from flask_login import LoginManager
 from config import ProductionConfig, DevelopmentConfig, TestingConfig
+import sentry_sdk
 
 
 logging.config.fileConfig("logging.conf")
@@ -16,6 +17,16 @@ login = LoginManager()
 
 
 def register_extensions(app):
+    if app.config.get('SENTRY_ENVIRONMENT') == 'production':
+        sentry_sdk.init(
+            dsn=app.config.get('SENTRY_FLASK_DSN'),
+            send_default_pii=True,
+            # Set traces_sample_rate to 1.0 to capture 100%
+            # of transactions for tracing.
+            traces_sample_rate=1.0,
+            environment=app.config.get('SENTRY_ENVIRONMENT'),
+        )
+
     db.init_app(app)
     migrate.init_app(app, db)
     login.init_app(app)
