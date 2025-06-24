@@ -63,9 +63,14 @@ def create_app(config_class=ProductionConfig):
         app.logger.error("SECRET_KEY configuration is missing")
         raise ValueError("SECRET_KEY configuration is missing")
 
+    # Create 'uploads' and 'avatars' folders if it doesn't exist
+    os.makedirs(app.config.get('UPLOAD_FOLDER'), exist_ok=True)
+    os.makedirs(app.config.get('AVATARS_FOLDER'), exist_ok=True)
+
     register_extensions(app)
     register_blueprints(app)
 
     return app
+
 
 from app import models

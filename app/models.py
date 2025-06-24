@@ -1,9 +1,11 @@
+import os
 import logging
 from datetime import datetime
 from typing import Optional, Iterable
 import sqlalchemy as sa
 import sqlalchemy.orm as so
 from app import db, login
+from flask import url_for, current_app
 from flask_login import UserMixin
 from werkzeug.security import generate_password_hash, check_password_hash
 
@@ -28,6 +30,7 @@ class User(UserMixin, BaseModel):
     phone: so.Mapped[str] = so.mapped_column(sa.String(32))
     gender: so.Mapped[str] = so.mapped_column(sa.String(32), index=True)
     about_me: so.Mapped[Optional[str]] = so.mapped_column(sa.String(256), default=None)
+    avatar_filename: so.Mapped[str] = so.mapped_column(sa.String(64), server_default='default.jpg')
     password_hash: so.Mapped[Optional[str]] = so.mapped_column(sa.String(256))
     active: so.Mapped[bool] = so.mapped_column(sa.Boolean, default=False)
     last_seen: so.Mapped[Optional[datetime]] = so.mapped_column(sa.DateTime, default=None)
@@ -90,8 +93,28 @@ class User(UserMixin, BaseModel):
 
     def add_score(self, score: int, comment: str):
         """Add score to user"""
-        score = Score(user_id=self.id, score=score, comment=comment)
-        db.session.add(score)
+        new_score = Score(user_id=self.id, score=score, comment=comment)
+        db.session.add(new_score)
+
+    def get_avatar_url(self, size: str = 'medium'):
+        """Return the URL for the user's avatar in specified size"""
+
+        # Size mappings
+        size_suffixes = {
+            'small': '_small',     # 50x50 for navigation
+            'medium': '_medium',   # 100x80 for ratings
+            'large': '_large',     # 300x300 for profiles
+            'thumbnail': '_thumb'  # 30x30 for very small displays
+        }
+
+        if size not in size_suffixes:
+            size = 'medium'  # Default fallback
+
+        # Get base filename without extension
+        name, ext = os.path.splitext(self.avatar_filename)
+        sized_filename = f"{name}{size_suffixes[size]}{ext}"
+
+        return url_for('static', filename=f'uploads/avatars/{sized_filename}')
 
 
 @login.user_loader

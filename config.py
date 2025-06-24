@@ -1,15 +1,20 @@
 import os
 from dotenv import load_dotenv
 
-basedir = os.path.abspath(os.path.dirname(__file__))
+BASEDIR = os.path.abspath(os.path.dirname(__file__))
 
 if os.environ.get('FLASK_ENV') == 'development':
-    load_dotenv(os.path.join(basedir, '.env'), override=True)
+    load_dotenv(os.path.join(BASEDIR, '.env'), override=True)
 
 
 class Config:
     SECRET_KEY = os.environ.get('SECRET_KEY')
     SESSION_COOKIE_NAME = os.environ.get('SESSION_COOKIE_NAME')
+
+    UPLOAD_FOLDER = os.path.join(BASEDIR, 'app', 'static', 'uploads')
+    AVATARS_FOLDER = os.path.join(UPLOAD_FOLDER, 'avatars')
+    ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg'}
+    MAX_CONTENT_LENGTH = 4 * 1024 * 1024  # 4MB max-limit
 
     SENTRY_FLASK_DSN = os.environ.get('SENTRY_FLASK_DSN')
 
@@ -26,7 +31,7 @@ class ProductionConfig(Config):
 
 class DevelopmentConfig(Config):
     SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL') or \
-        'sqlite:///' + os.path.join(basedir, 'app.db')
+        'sqlite:///' + os.path.join(BASEDIR, 'app.db')
     SENTRY_ENVIRONMENT = 'development'
 
 
