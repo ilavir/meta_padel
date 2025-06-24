@@ -125,6 +125,17 @@ def edit_profile():
 
     if form.validate_on_submit():
         logger.debug(f'Edit profile form submitted. Email: {form.email.data}')
+        logger.debug(f'Form data: {form.data}')
+
+        # Handle avatar upload
+        if form.avatar.data:
+            # Delete old avatar files if it's not the default
+            if current_user.avatar_filename != 'default.jpg':
+                User.delete_avatar_files(current_user.avatar_filename)
+
+            # Save new avatar
+            picture_file = User.save_avatar(form.avatar.data)
+            current_user.avatar_filename = picture_file
 
         current_user.update_from_dict(form.data)
         db.session.commit()

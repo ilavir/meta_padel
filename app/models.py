@@ -8,6 +8,8 @@ from app import db, login
 from flask import url_for, current_app
 from flask_login import UserMixin
 from werkzeug.security import generate_password_hash, check_password_hash
+import secrets
+from PIL import Image
 
 logger = logging.getLogger(__name__)
 
@@ -114,7 +116,120 @@ class User(UserMixin, BaseModel):
         name, ext = os.path.splitext(self.avatar_filename)
         sized_filename = f"{name}{size_suffixes[size]}{ext}"
 
-        return url_for('static', filename=f'uploads/avatars/{sized_filename}')
+        avatars_path = os.path.relpath(current_app.config['AVATARS_FOLDER'], current_app.static_folder)
+        return url_for('static', filename=f'{avatars_path}/{sized_filename}')
+
+    @staticmethod
+    def save_avatar(form_picture):
+        """Save uploaded avatar in multiple sizes and return base filename"""
+
+        # Generate random filename
+        random_hex = secrets.token_hex(8)
+        _, f_ext = os.path.splitext(form_picture.filename)
+        if f_ext.lower() not in current_app.config['AVATARS_ALLOWED_EXTENSIONS']:
+            f_ext = '.jpg'  # Default to jpg if no valid extension
+
+        picture_fn = random_hex + f_ext
+
+        # Create the profile_pics directory path
+        pics_dir = current_app.config['AVATARS_FOLDER']
+        os.makedirs(pics_dir, exist_ok=True)
+
+        # Open and process the image
+        img = Image.open(form_picture)
+
+        # Convert to RGB if necessary (for PNG with transparency)
+        if img.mode in ('RGBA', 'LA', 'P'):
+            background = Image.new('RGB', img.size, (255, 255, 255))
+            if img.mode == 'P':
+                img = img.convert('RGBA')
+            background.paste(img, mask=img.split()[-1] if img.mode == 'RGBA' else None)
+            img = background
+
+        # Define sizes to generate
+        sizes = current_app.config['AVATARS_SIZES']
+
+        # Generate and save each size
+        base_name = os.path.splitext(picture_fn)[0]
+        for size_name, dimensions in sizes.items():
+            # Create a copy of the image for this size
+            img_copy = img.copy()
+
+            # For non-square dimensions, we'll crop to fit
+            if size_name == 'medium':  # 100x80 - crop to fit
+                img_copy = User._crop_to_fit(img_copy, dimensions)
+            else:  # Square images - use thumbnail (maintains aspect ratio)
+                img_copy.thumbnail(dimensions, Image.Resampling.LANCZOS)
+
+                # If thumbnail doesn't make it square, crop it
+                if img_copy.size != dimensions:
+                    img_copy = User._crop_center(img_copy, dimensions)
+
+            # Save the sized image
+            suffix = f"_{size_name}" if size_name != 'medium' else '_medium'
+            sized_filename = f"{base_name}{suffix}{f_ext}"
+            sized_path = os.path.join(pics_dir, sized_filename)
+
+            img_copy.save(sized_path, quality=95, optimize=True)
+
+        return picture_fn
+
+    @staticmethod
+    def _crop_to_fit(img, size):
+        """Crop image to fit exact dimensions"""
+        target_width, target_height = size
+        img_width, img_height = img.size
+
+        # Calculate ratios
+        target_ratio = target_width / target_height
+        img_ratio = img_width / img_height
+
+        if img_ratio > target_ratio:
+            # Image is wider than target - crop width
+            new_width = int(img_height * target_ratio)
+            left = (img_width - new_width) // 2
+            img = img.crop((left, 0, left + new_width, img_height))
+        else:
+            # Image is taller than target - crop height
+            new_height = int(img_width / target_ratio)
+            top = (img_height - new_height) // 2
+            img = img.crop((0, top, img_width, top + new_height))
+
+        # Resize to exact dimensions
+        return img.resize(size, Image.Resampling.LANCZOS)
+
+    @staticmethod
+    def _crop_center(img, size):
+        """Crop image from center to exact dimensions"""
+        img_width, img_height = img.size
+        target_width, target_height = size
+
+        left = (img_width - target_width) // 2
+        top = (img_height - target_height) // 2
+        right = left + target_width
+        bottom = top + target_height
+
+        return img.crop((left, top, right, bottom))
+
+    @staticmethod
+    def delete_avatar_files(avatar_filename: str):
+        """Delete all sized versions of an avatar file"""
+        if avatar_filename == 'default.jpg':
+            return  # Don't delete default avatar
+
+        pics_dir = current_app.config['AVATARS_FOLDER']
+        base_name, ext = os.path.splitext(avatar_filename)
+
+        # Delete all size variants
+        size_suffixes = ['_thumbnail', '_small', '_medium', '_large']
+        for suffix in size_suffixes:
+            filename = f"{base_name}{suffix}{ext}"
+            file_path = os.path.join(pics_dir, filename)
+            if os.path.exists(file_path):
+                try:
+                    os.remove(file_path)
+                except OSError:
+                    pass
 
 
 @login.user_loader

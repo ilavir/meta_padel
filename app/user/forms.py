@@ -1,4 +1,5 @@
 from flask_wtf import FlaskForm
+from flask_wtf.file import FileField, FileAllowed
 from wtforms import StringField, PasswordField, BooleanField, SubmitField, TelField, \
     EmailField, SelectField, TextAreaField
 from wtforms.validators import DataRequired, Length, Email, EqualTo, ValidationError
@@ -72,6 +73,10 @@ class EditProfileForm(FlaskForm):
                          validators=[DataRequired(message='Обязательное поле')])
     about_me = TextAreaField('О себе', validators=[
         Length(max=ABOUT_ME_MAX_LENGTH, message=f'Поле не может содержать более {ABOUT_ME_MAX_LENGTH} символов')])
+    avatar = FileField('Обновить аватарку',
+                       validators=[FileAllowed(['png', 'jpg', 'jpeg'],
+                                               'Только файлы с расширениями .png, .jpg, .jpeg')])
+
     submit = SubmitField('Сохранить')
 
     def validate_email(self, email):

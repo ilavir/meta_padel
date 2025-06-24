@@ -31,3 +31,13 @@
         <div class="invalid-feedback">{{ field.errors|join(', ') }}</div>
     {% endif %}
 {% endmacro %}
+
+{% macro file(field, label) %}
+    {% if label %}
+        {{ field.label(class='form-label') }}
+    {% endif %}
+    {{ field(class='form-control' + (' is-invalid' if field.errors else '')) }}
+    {% if field.errors %}
+        <div class="invalid-feedback">{{ field.errors|join(', ') }}</div>
+    {% endif %}
+{% endmacro %}

@@ -13,8 +13,14 @@ class Config:
 
     UPLOAD_FOLDER = os.path.join(BASEDIR, 'app', 'static', 'uploads')
     AVATARS_FOLDER = os.path.join(UPLOAD_FOLDER, 'avatars')
-    ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg'}
-    MAX_CONTENT_LENGTH = 4 * 1024 * 1024  # 4MB max-limit
+    AVATARS_ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg'}
+    AVATARS_MAX_CONTENT_LENGTH = 4 * 1024 * 1024  # 4MB max-limit
+    AVATARS_SIZES = {
+            'thumbnail': (30, 30),
+            'small': (50, 50),
+            'medium': (100, 80),
+            'large': (300, 300)
+        }
 
     SENTRY_FLASK_DSN = os.environ.get('SENTRY_FLASK_DSN')
 
