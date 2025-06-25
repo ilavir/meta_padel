@@ -10,6 +10,8 @@ services:
       - "5100:5100"
     env_file:
       - .env
+    volumes:
+      - avatars_data:/app/app/static/uploads/avatars
     stop_signal: SIGINT
     restart: unless-stopped
     depends_on:
@@ -62,6 +64,8 @@ services:
 volumes:
   mariadb_data:
     name: meta_padel-mariadb_data
+  avatars_data:
+    name: meta_padel-avatars_data
 
 networks:
   meta_padel:

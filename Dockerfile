@@ -30,6 +30,9 @@ COPY app/ app/
 COPY migrations/ migrations/
 COPY tennis.py config.py logging.conf start.sh init_db.py ./
 
+# Create uploads directory
+RUN mkdir -p app/static/uploads/avatars
+
 # Set correct permissions
 RUN chown -R appuser:appuser /app \
     && chmod +x start.sh
