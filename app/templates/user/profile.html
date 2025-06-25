@@ -7,19 +7,17 @@
             <h1 class="text-center">{{ title }}</h1>
         </div>
     </div>
-    <img src="{{ user.get_avatar_url('large') }}"
+    <div class="row mb-3">
+        <div class="col-auto">
+            <img src="{{ user.get_avatar_url('medium') }}"
                          alt="Avatar"
                          class="rounded-circle mb-3"
                          style="width: 300px; height: 300px; object-fit: cover;">
-    {% if user == current_user %}
-    <div class="row mb-3">
-        <div class="col">
-            <a href="{{ url_for('user.edit_profile') }}" class="btn btn-primary">Редактировать профиль</a>
         </div>
-    </div>
-    {% endif %}
-    <div class="row">
         <div class="col">
+            {% if user == current_user %}
+            <a href="{{ url_for('user.edit_profile') }}" class="btn btn-primary">Редактировать профиль</a><br><br>
+            {% endif %}
             <p><strong>Логин</strong>: {{ user.username }}<br>
             <strong>Email</strong>: {{ user.email }}<br>
             <strong>Имя</strong>: {{ user.name }}<br>

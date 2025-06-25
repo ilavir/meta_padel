@@ -44,6 +44,9 @@ def register_blueprints(app):
     from app.users import bp as users_bp
     app.register_blueprint(users_bp, url_prefix='/users')
 
+    from app.cli import bp as cli_bp
+    app.register_blueprint(cli_bp)
+
 
 def create_app(config_class=ProductionConfig):
     app = Flask(__name__, instance_relative_config=True)

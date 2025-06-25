@@ -31,6 +31,7 @@
                     <tr>
                         <th scope="col" style="width: 10px;">№</th>
                         <th scope="col" style="width: 60px;"></th>
+                        <th scope="col"></th>
                         <th scope="col">Игрок</th>
                         <th scope="col" class="text-end">Очки</th>
                     </tr>
@@ -52,6 +53,7 @@
                                 <span class="text-muted">–</span>
                             {% endif %}
                         </td>
+                        <td><img src="{{ player.user.get_avatar_url('thumbnail') }}" alt="{{ player.user.name }}"></td>
                         <td><a href="{{ url_for('user.profile', username=player.user.username) }}">{{ player.user.name }}</a></td>
                         <td class="text-end">{{ player.user.total_score }}</td>
                     </tr>
