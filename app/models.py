@@ -106,7 +106,7 @@ class User(UserMixin, BaseModel):
             'small': '_small',     # 50x50 for navigation
             'medium': '_medium',   # 100x80 for ratings
             'large': '_large',     # 300x300 for profiles
-            'thumbnail': '_thumb'  # 30x30 for very small displays
+            'thumbnail': '_thumbnail'  # 30x30 for very small displays
         }
 
         if size not in size_suffixes:

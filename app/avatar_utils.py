@@ -1,6 +1,6 @@
 from flask import current_app, url_for
 import os
-from PIL import Image
+from PIL import Image, ImageDraw
 
 
 class AvatarManager:
@@ -132,6 +132,54 @@ class AvatarManager:
         except Exception as e:
             print(f"Error regenerating avatar sizes: {e}")
             return False
+
+    @staticmethod
+    def init_default():
+        """Create necessary directories for file uploads with tennis-themed default avatars"""
+        profile_pics_dir = current_app.config['AVATARS_FOLDER']
+        os.makedirs(profile_pics_dir, exist_ok=True)
+
+        # Create default avatar files in all sizes if they don't exist
+        default_paths = {
+            'default_thumbnail.jpg': (30, 30),
+            'default_small.jpg': (50, 50),
+            'default_medium.jpg': (100, 80),
+            'default_large.jpg': (300, 300)
+        }
+
+        for filename, size in default_paths.items():
+            default_path = os.path.join(profile_pics_dir, filename)
+            if not os.path.exists(default_path):
+                # Create a simple monochrome avatar with a tennis motif
+                img = Image.new('RGB', size, color='white')
+                draw = ImageDraw.Draw(img)
+                w, h = size
+
+                # Draw a gray tennis ball
+                ball_radius = min(w, h) // 3
+                center = (w // 2, h // 2)
+                bbox = [
+                    (center[0] - ball_radius, center[1] - ball_radius),
+                    (center[0] + ball_radius, center[1] + ball_radius)
+                ]
+                gray_ball = (160, 160, 160)
+                draw.ellipse(bbox, fill=gray_ball, outline=(100, 100, 100))
+
+                # Add curved seams in lighter gray
+                if w >= 50:  # Skip seams on very small avatars
+                    seam_offset = ball_radius // 2
+                    light_gray = (220, 220, 220)
+                    draw.arc([bbox[0][0] + seam_offset, bbox[0][1],
+                             bbox[1][0] - seam_offset, bbox[1][1]],
+                             start=0, end=180, fill=light_gray, width=2)
+                    draw.arc([bbox[0][0], bbox[0][1] + seam_offset,
+                             bbox[1][0], bbox[1][1] - seam_offset],
+                             start=90, end=270, fill=light_gray, width=2)
+
+                img.save(default_path, quality=95)
+                print(f"Created tennis-themed default avatar: {filename}")
+
+        print(f"Upload directories created at {profile_pics_dir}")
 
 
 # Template filter for easy use in Jinja2

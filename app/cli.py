@@ -63,3 +63,11 @@ def regenerate_user(username):
         click.echo(f"✓ Regenerated avatar sizes for {username}")
     else:
         click.echo(f"✗ Failed to regenerate avatar sizes for {username}")
+
+
+@avatar.command()
+@with_appcontext
+def init_default():
+    """Initialize default avatar files."""
+    AvatarManager.init_default()
+    click.echo("Default avatar files initialized.")
