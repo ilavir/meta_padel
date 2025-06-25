@@ -17,8 +17,8 @@ class Config:
     AVATARS_MAX_CONTENT_LENGTH = 4 * 1024 * 1024  # 4MB max-limit
     AVATARS_SIZES = {
             'thumbnail': (30, 30),
-            'small': (50, 50),
-            'medium': (100, 80),
+            'small': (100, 100),
+            'medium': (200, 200),
             'large': (300, 300)
         }
 

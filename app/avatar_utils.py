@@ -8,8 +8,8 @@ class AvatarManager:
 
     SIZES = {
         'thumbnail': (30, 30),
-        'small': (50, 50),
-        'medium': (100, 80),
+        'small': (100, 100),
+        'medium': (200, 200),
         'large': (300, 300)
     }
 
@@ -141,10 +141,10 @@ class AvatarManager:
 
         # Create default avatar files in all sizes if they don't exist
         default_paths = {
-            'default_thumbnail.jpg': (30, 30),
-            'default_small.jpg': (50, 50),
-            'default_medium.jpg': (100, 80),
-            'default_large.jpg': (300, 300)
+            'default_thumbnail.jpg': AvatarManager.SIZES['thumbnail'],
+            'default_small.jpg': AvatarManager.SIZES['small'],
+            'default_medium.jpg': AvatarManager.SIZES['medium'],
+            'default_large.jpg': AvatarManager.SIZES['large']
         }
 
         for filename, size in default_paths.items():
