@@ -167,7 +167,6 @@ flask run
 flask avatar cleanup           # Remove orphaned avatars
 flask avatar regenerate       # Regenerate all avatar sizes
 flask avatar regenerate-user <username>  # Regenerate for specific user
-flask avatar init-default     # Initialize default avatars
 ```
 
 ### Docker Commands
