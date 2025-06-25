@@ -1,8 +1,6 @@
 app.db
-app/static/uploads/*
-!app/static/uploads/avatars/
-app/static/uploads/avatars/*
-!app/static/uploads/avatars/default_*
+app/static/uploads/
+
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
