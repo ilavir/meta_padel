@@ -1,5 +1,6 @@
 import os
 from dotenv import load_dotenv
+from urllib.parse import quote
 
 BASEDIR = os.path.abspath(os.path.dirname(__file__))
 
@@ -29,7 +30,7 @@ class ProductionConfig(Config):
     DB_HOST = os.environ.get('DATABASE_HOST')
     DB_PORT = os.environ.get('DATABASE_PORT')
     DB_USER = os.environ.get('MARIADB_USER')
-    DB_PASSWORD = os.environ.get('MARIADB_PASSWORD')
+    DB_PASSWORD = quote(os.environ.get('MARIADB_PASSWORD'))
     DB_NAME = os.environ.get('MARIADB_DATABASE')
     SQLALCHEMY_DATABASE_URI = f"mysql+pymysql://{DB_USER}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/{DB_NAME}"
     SENTRY_ENVIRONMENT = 'production'
