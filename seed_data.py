@@ -7,7 +7,7 @@ from datetime import datetime, timedelta
 from faker import Faker
 import sqlalchemy as sa
 from app import create_app, db
-from app.models import User, Role, Score
+from app.models import User, Role, Score, ScoreTemplate
 from config import DevelopmentConfig
 
 # Initialize Flask app and Faker
@@ -78,15 +78,66 @@ def create_users(roles):
     return users
 
 
-def create_scores(users):
+def create_score_templates():
+    """Create predefined score templates for common scenarios"""
+    templates = [
+        {"name": "Победа в турнире", "score": 50, "comment": "Победа в турнире клуба"},
+        {"name": "Финал турнира", "score": 30, "comment": "Выход в финал турнира"},
+        {"name": "Полуфинал турнира", "score": 20, "comment": "Выход в полуфинал турнира"},
+        {"name": "Четвертьфинал", "score": 15, "comment": "Выход в четвертьфинал турнира"},
+        {"name": "Победа в матче", "score": 10, "comment": "Победа в обычном матче"},
+        {"name": "Отличная игра", "score": 8, "comment": "Отличная техника и тактика"},
+        {"name": "Хорошая игра", "score": 5, "comment": "Хорошее выступление"},
+        {"name": "Участие в турнире", "score": 3, "comment": "Участие в турнире клуба"},
+        {"name": "Посещение тренировки", "score": 2, "comment": "Регулярное посещение тренировок"},
+        {"name": "Помощь в организации", "score": 5, "comment": "Помощь в организации мероприятий"},
+        {"name": "Нарушение правил", "score": -5, "comment": "Нарушение правил или неспортивное поведение"},
+        {"name": "Пропуск без уважительной причины", "score": -2, "comment": "Пропуск матча без предупреждения"},
+    ]
+
+    created_templates = []
+    for template_data in templates:
+        # Check if template already exists
+        existing_template = db.session.scalar(
+            sa.select(ScoreTemplate).where(ScoreTemplate.name == template_data["name"])
+        )
+        if existing_template:
+            print(f"Template '{template_data['name']}' already exists")
+            created_templates.append(existing_template)
+            continue
+
+        # Create new template
+        template = ScoreTemplate(
+            name=template_data["name"],
+            score=template_data["score"],
+            comment=template_data["comment"]
+        )
+        db.session.add(template)
+        created_templates.append(template)
+
+    db.session.commit()
+    print(f"Created {len(created_templates)} score templates")
+    return created_templates
+
+
+def create_scores(users, templates=None):
     """Create random scores for users"""
     scores = []
     now = datetime.now()
 
     for user in users:
         for _ in range(SCORES_PER_USER):
-            # Random score between 1 and 100
-            score_value = random.randint(1, 100)
+            # Random score between 1 and 100, but sometimes use templates
+            if templates and random.choice([True, False]):
+                # Use a template 50% of the time
+                template = random.choice(templates)
+                score_value = template.score
+                comment = template.comment
+            else:
+                # Generate random score
+                score_value = random.randint(1, 100)
+                comment = fake.sentence()
+
             # Random date within the last 30 days
             score_date = now - timedelta(days=random.randint(0, 30))
             # Random user as creator (could be the same user or different)
@@ -95,7 +146,7 @@ def create_scores(users):
             score = Score(
                 user_id=user.id,
                 score=score_value,
-                comment=fake.sentence(),
+                comment=comment,
                 created_by=creator.id,
                 created_at=score_date
             )
@@ -125,7 +176,8 @@ def seed_database():
     # Create test data
     roles = create_roles()
     users = create_users(roles)
-    create_scores(users)
+    templates = create_score_templates()
+    create_scores(users, templates)
 
     print("Database seeding completed successfully!")
 

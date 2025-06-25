@@ -44,6 +44,7 @@ WORKDIR /app
 
 # Copy virtual environment from builder stage
 COPY --from=builder /opt/venv /opt/venv
+RUN chown -R appuser:appuser /opt/venv
 
 # Copy application files with proper ownership
 COPY --chown=appuser:appuser app/ app/
