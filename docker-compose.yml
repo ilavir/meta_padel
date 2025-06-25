@@ -5,14 +5,17 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
+      target: production
     image: meta_padel:latest
+    container_name: meta_padel_web
     ports:
       - "5100:5100"
     env_file:
       - .env
     volumes:
       - avatars_data:/app/app/static/uploads/avatars
-    stop_signal: SIGINT
+    stop_signal: SIGTERM
+    stop_grace_period: 30s
     restart: unless-stopped
     depends_on:
       mariadb:
@@ -20,38 +23,53 @@ services:
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:5100/health"]
       interval: 30s
-      timeout: 5s
+      timeout: 10s
       retries: 3
-      start_period: 15s
+      start_period: 30s
     networks:
       - meta_padel
+    security_opt:
+      - no-new-privileges:true
+    read_only: false
+    tmpfs:
+      - /tmp:size=100M,mode=1777
 
   mariadb:
     image: mariadb:11
+    container_name: meta_padel_mariadb
     environment:
-      MARIADB_ROOT_PASSWORD: ${MARIADB_ROOT_PASSWORD}
-      MARIADB_DATABASE: ${MARIADB_DATABASE}
-      MARIADB_USER: ${MARIADB_USER}
-      MARIADB_PASSWORD: ${MARIADB_PASSWORD}
+      MARIADB_ROOT_PASSWORD: ${MARIADB_ROOT_PASSWORD:-defaultpassword}
+      MARIADB_DATABASE: ${MARIADB_DATABASE:-meta_padel}
+      MARIADB_USER: ${MARIADB_USER:-padel_user}
+      MARIADB_PASSWORD: ${MARIADB_PASSWORD:-defaultpassword}
+      MARIADB_AUTO_UPGRADE: 1
+      MARIADB_DISABLE_UPGRADE_BACKUP: 1
     volumes:
       - mariadb_data:/var/lib/mysql
+      - mariadb_config:/etc/mysql/conf.d
     healthcheck:
-      test: ["CMD", "mariadb-admin", "ping", "-h", "localhost", "-u", "${MARIADB_USER}", "-p${MARIADB_PASSWORD}"]
+      test: ["CMD", "mariadb-admin", "ping", "-h", "localhost", "-u", "${MARIADB_USER:-padel_user}", "-p${MARIADB_PASSWORD:-defaultpassword}"]
       interval: 30s
-      timeout: 5s
-      retries: 3
-      start_period: 15s
+      timeout: 10s
+      retries: 5
+      start_period: 30s
     restart: unless-stopped
     networks:
       - meta_padel
+    security_opt:
+      - no-new-privileges:true
+    tmpfs:
+      - /tmp:size=100M,mode=1777
 
   phpmyadmin:
     image: phpmyadmin:latest
+    container_name: meta_padel_phpmyadmin
     environment:
       PMA_HOST: mariadb
-      # PMA_USER: ${MARIADB_USER}
-      # PMA_PASSWORD: ${MARIADB_PASSWORD}
+      PMA_PORT: 3306
       UPLOAD_LIMIT: 200M
+      MEMORY_LIMIT: 512M
+      MAX_EXECUTION_TIME: 600
     ports:
       - "5188:80"
     restart: unless-stopped
@@ -60,12 +78,21 @@ services:
         condition: service_healthy
     networks:
       - meta_padel
+    security_opt:
+      - no-new-privileges:true
+    tmpfs:
+      - /tmp:size=100M,mode=1777
 
 volumes:
   mariadb_data:
     name: meta_padel-mariadb_data
+    driver: local
+  mariadb_config:
+    name: meta_padel-mariadb_config
+    driver: local
   avatars_data:
     name: meta_padel-avatars_data
+    driver: local
 
 networks:
   meta_padel:

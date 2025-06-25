@@ -5,9 +5,9 @@ set -e
 echo "Running database migrations..."
 flask db upgrade
 
-# Initialize database roles if not already done
-# echo "Checking database initialization..."
-# python init_db.py
+# Initialize application if not already done
+# echo "Checking application initialization..."
+# python init_app.py
 
 # Start the application
 echo "Starting application..."
