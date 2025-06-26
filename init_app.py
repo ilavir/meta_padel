@@ -5,7 +5,6 @@ This script fully initializes the application with an empty database.
 """
 import argparse
 import os
-import sys
 import sqlalchemy as sa
 from flask import current_app
 from PIL import Image, ImageDraw, ImageFont
@@ -13,25 +12,26 @@ from app import create_app, db
 from app.models import User, Role
 from config import DevelopmentConfig, ProductionConfig
 
+
 def create_default_avatars():
     """Create default avatars for all users"""
     avatars_dir = current_app.config['AVATARS_FOLDER']
     os.makedirs(avatars_dir, exist_ok=True)
-    
+
     # Define avatar sizes from config
     sizes = current_app.config['AVATARS_SIZES']
-    
+
     # Color scheme for default avatar
     color_scheme = {'bg': '#95a5a6', 'text': '#ffffff'}  # Gray background with white text
-    
+
     # Generate each size for default avatar
     for size_name, dimensions in sizes.items():
         width, height = dimensions
-        
+
         # Create image with colored background
         img = Image.new('RGB', (width, height), color_scheme['bg'])
         draw = ImageDraw.Draw(img)
-        
+
         # Try to use a system font, fallback to default if not available
         try:
             # Try to load a nice font
@@ -44,26 +44,27 @@ def create_default_avatars():
                 font = ImageFont.load_default()
             except:
                 font = None
-        
+
         # Draw user icon (simple circle with person silhouette or just a circle)
         circle_radius = min(width, height) // 4
         center_x, center_y = width // 2, height // 2
-        
+
         # Draw a simple circle as user icon
         draw.ellipse([
-            center_x - circle_radius, 
+            center_x - circle_radius,
             center_y - circle_radius,
-            center_x + circle_radius, 
+            center_x + circle_radius,
             center_y + circle_radius
         ], fill=color_scheme['text'])
-        
+
         # Save the avatar
         suffix = f"_{size_name}" if size_name != 'medium' else '_medium'
         filename = f"default{suffix}.jpg"
         filepath = os.path.join(avatars_dir, filename)
-        
+
         img.save(filepath, 'JPEG', quality=95, optimize=True)
         print(f"Created default avatar: {filename}")
+
 
 def create_roles():
     """Create required roles in the database"""
@@ -90,6 +91,7 @@ def create_roles():
     db.session.commit()
     print(f"Roles initialized: {', '.join(role.name for role in created_roles)}")
     return created_roles
+
 
 def create_superadmin(email, password, username=None, name="Super Admin", phone="", gender="male"):
     """Create a superadmin user if it doesn't exist"""
@@ -128,11 +130,13 @@ def create_superadmin(email, password, username=None, name="Super Admin", phone=
     print(f"Superadmin user '{email}' created successfully")
     return user
 
+
 def create_database_tables():
     """Create all database tables"""
     print("Creating database tables...")
     db.create_all()
     print("Database tables created successfully")
+
 
 def run_migrations():
     """Run database migrations if migration folder exists"""
@@ -150,26 +154,28 @@ def run_migrations():
     else:
         print("No migrations directory found, skipping migrations")
 
+
 def initialize_application():
     """Initialize the complete application"""
     print("Starting complete application initialization...")
-    
+
     # Create database tables or run migrations
     try:
         run_migrations()
     except Exception as e:
         print(f"Migrations failed, creating tables manually: {e}")
         create_database_tables()
-    
+
     # Create default avatars
     print("Creating default avatars...")
     create_default_avatars()
-    
+
     # Create roles
     print("Creating system roles...")
     create_roles()
-    
+
     print("Application initialization completed successfully!")
+
 
 def init_database(create_admin=False, email=None, password=None, username=None, name=None, phone=None, gender=None):
     """Initialize the database with required roles and optionally a superadmin user"""
@@ -183,7 +189,7 @@ def init_database(create_admin=False, email=None, password=None, username=None, 
         if not all([email, password]):
             print("Error: email and password are required to create a superadmin user")
             return
-        
+
         # Use provided values or defaults
         create_superadmin(
             email=email,
@@ -196,6 +202,7 @@ def init_database(create_admin=False, email=None, password=None, username=None, 
 
     print("Database initialization completed successfully!")
 
+
 def get_config_class():
     """Get the appropriate configuration class based on environment"""
     env = os.environ.get('FLASK_ENV', 'development').lower()
@@ -203,6 +210,7 @@ def get_config_class():
         return ProductionConfig
     else:
         return DevelopmentConfig
+
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Initialize Meta Padel Rating System database")

@@ -19,21 +19,20 @@
             <table class="table table-striped table-hover">
                 <thead>
                     <tr>
-                        <th scope="col" class="col-2">Имя</th>
-                        <th scope="col">Комментарий</th>
+                        <th scope="col">Имя шаблона</th>
                         <th scope="col" class="text-end">Очки</th>
-                        <th scope="col" style="width: 60px;"></th>
+                        <th scope="col" style="width: 120px;"></th>
                     </tr>
                 </thead>
                 <tbody>
                     {% for template in templates %}
                     <tr>
-                        <td scope="row">{{ template.name }}</th>
-                        <td>{{ template.comment }}</td>
+                        <td scope="row">{{ template.name }}</td>
                         <td class="text-end">{{ template.score }}</td>
                         <td>
-                            <i class="fas fa-edit"></i>
-                            <a href="{{ url_for('rating.edit_score_template', template_id=template.id) }}" class="btn btn-primary btn-sm">Изменить</a>
+                            <a href="{{ url_for('rating.edit_score_template', template_id=template.id) }}" class="btn btn-primary btn-sm">
+                                <i class="fas fa-edit"></i> Изменить
+                            </a>
                         </td>
                     </tr>
                     {% endfor %}

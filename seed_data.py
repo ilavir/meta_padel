@@ -2,17 +2,27 @@
 """
 Script to populate the database with test data for users, scores, and roles.
 """
+import os
 import random
 from datetime import datetime, timedelta
 from faker import Faker
 import sqlalchemy as sa
 from app import create_app, db
 from app.models import User, Role, Score, ScoreTemplate
-from config import DevelopmentConfig
+from config import DevelopmentConfig, ProductionConfig
+
+
+def get_config_class():
+    """Get the appropriate configuration class based on environment"""
+    env = os.environ.get('FLASK_ENV', 'development').lower()
+    if env == 'production':
+        return ProductionConfig
+    else:
+        return DevelopmentConfig
+
 
 # Initialize Flask app and Faker
-# app = create_app(config_class=DevelopmentConfig)
-app = create_app()
+app = create_app(config_class=get_config_class())
 fake = Faker()
 
 # Number of test records to create
@@ -81,18 +91,18 @@ def create_users(roles):
 def create_score_templates():
     """Create predefined score templates for common scenarios"""
     templates = [
-        {"name": "Победа в турнире", "score": 50, "comment": "Победа в турнире клуба"},
-        {"name": "Финал турнира", "score": 30, "comment": "Выход в финал турнира"},
-        {"name": "Полуфинал турнира", "score": 20, "comment": "Выход в полуфинал турнира"},
-        {"name": "Четвертьфинал", "score": 15, "comment": "Выход в четвертьфинал турнира"},
-        {"name": "Победа в матче", "score": 10, "comment": "Победа в обычном матче"},
-        {"name": "Отличная игра", "score": 8, "comment": "Отличная техника и тактика"},
-        {"name": "Хорошая игра", "score": 5, "comment": "Хорошее выступление"},
-        {"name": "Участие в турнире", "score": 3, "comment": "Участие в турнире клуба"},
-        {"name": "Посещение тренировки", "score": 2, "comment": "Регулярное посещение тренировок"},
-        {"name": "Помощь в организации", "score": 5, "comment": "Помощь в организации мероприятий"},
-        {"name": "Нарушение правил", "score": -5, "comment": "Нарушение правил или неспортивное поведение"},
-        {"name": "Пропуск без уважительной причины", "score": -2, "comment": "Пропуск матча без предупреждения"},
+        {"name": "Победа в турнире", "score": 50},
+        {"name": "Финал турнира", "score": 30},
+        {"name": "Полуфинал турнира", "score": 20},
+        {"name": "Четвертьфинал", "score": 15},
+        {"name": "Победа в матче", "score": 10},
+        {"name": "Отличная игра", "score": 8},
+        {"name": "Хорошая игра", "score": 5},
+        {"name": "Участие в турнире", "score": 3},
+        {"name": "Посещение тренировки", "score": 2},
+        {"name": "Помощь в организации", "score": 5},
+        {"name": "Нарушение правил", "score": -5},
+        {"name": "Пропуск без уважительной причины", "score": -2},
     ]
 
     created_templates = []
@@ -109,8 +119,7 @@ def create_score_templates():
         # Create new template
         template = ScoreTemplate(
             name=template_data["name"],
-            score=template_data["score"],
-            comment=template_data["comment"]
+            score=template_data["score"]
         )
         db.session.add(template)
         created_templates.append(template)
@@ -132,7 +141,7 @@ def create_scores(users, templates=None):
                 # Use a template 50% of the time
                 template = random.choice(templates)
                 score_value = template.score
-                comment = template.comment
+                comment = template.name
             else:
                 # Generate random score
                 score_value = random.randint(1, 100)

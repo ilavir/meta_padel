@@ -39,7 +39,7 @@
             {% for template in score_templates %}
             <button type="submit" class="btn btn-success d-flex align-items-center gap-2" onclick="submitTemplate({{ template.id }})">
                 <i class="bi bi-plus-circle"></i>
-                <span>{{ template.comment }}</span>
+                <span>{{ template.name }}</span>
                 <span class="badge bg-light text-dark">{{ template.score }} очков</span>
             </button>
             {% endfor %}

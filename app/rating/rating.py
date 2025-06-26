@@ -130,7 +130,7 @@ def apply_score_template():
         score = Score(
             user_id=user_id,
             score=template.score,
-            comment=template.comment,
+            comment=template.name,
             created_by=current_user.id
         )
         db.session.add(score)
