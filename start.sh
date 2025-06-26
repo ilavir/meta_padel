@@ -11,4 +11,4 @@ flask db upgrade
 
 # Start the application
 echo "Starting application..."
-exec gunicorn -b :5100 -w 1 --access-logfile - --error-logfile - tennis:app
+exec gunicorn -b :5100 -w 2 --access-logfile - --error-logfile - tennis:app
