@@ -7,6 +7,45 @@ import sqlalchemy as sa
 from app import db
 from app.models import User
 from flask_login import current_user
+from flask import current_app
+
+
+class FileSizeValidator:
+    """Custom validator for file size"""
+    def __init__(self, max_size_func=None, message=None):
+        self.max_size_func = max_size_func
+        if not message:
+            self.message = None  # Will be set dynamically
+        else:
+            self.message = message
+
+    def __call__(self, form, field):
+        if field.data:
+            # Get max size from config
+            max_size = self.max_size_func() if callable(self.max_size_func) else self.max_size_func
+            if max_size is None:
+                max_size = current_app.config.get('AVATARS_MAX_CONTENT_LENGTH', 4 * 1024 * 1024)
+
+            # Set message if not provided
+            if self.message is None:
+                self.message = f'Размер файла не должен превышать {self._format_size(max_size)}'
+
+            # Get file size by seeking to end and back
+            field.data.seek(0, 2)  # Seek to end
+            file_size = field.data.tell()
+            field.data.seek(0)  # Seek back to beginning
+
+            if file_size > max_size:
+                raise ValidationError(self.message)
+
+    def _format_size(self, size_bytes):
+        """Format bytes to human readable format"""
+        if size_bytes >= 1024 * 1024:
+            return f'{size_bytes / (1024 * 1024):.1f} МБ'
+        elif size_bytes >= 1024:
+            return f'{size_bytes / 1024:.1f} КБ'
+        else:
+            return f'{size_bytes} байт'
 
 
 class LoginForm(FlaskForm):
@@ -79,8 +118,11 @@ class EditProfileForm(FlaskForm):
     about_me = TextAreaField('О себе', validators=[
         Length(max=ABOUT_ME_MAX_LENGTH, message=f'Поле не может содержать более {ABOUT_ME_MAX_LENGTH} символов')])
     avatar = FileField('Обновить аватарку',
-                       validators=[FileAllowed(['png', 'jpg', 'jpeg'],
-                                               'Только файлы с расширениями .png, .jpg, .jpeg')])
+                       validators=[
+                           FileAllowed(['png', 'jpg', 'jpeg'],
+                                       'Только файлы с расширениями .png, .jpg, .jpeg'),
+                           FileSizeValidator()
+                       ])
 
     submit = SubmitField('Сохранить')
 

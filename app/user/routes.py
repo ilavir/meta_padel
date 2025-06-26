@@ -1,6 +1,6 @@
 import logging
 from urllib.parse import urlsplit
-from flask import render_template, redirect, url_for, flash, request
+from flask import render_template, redirect, url_for, flash, request, current_app
 from flask_login import current_user, login_user, logout_user, login_required
 from . import bp
 from .forms import LoginForm, RegistrationForm, EditProfileForm
@@ -129,6 +129,26 @@ def edit_profile():
 
         # Handle avatar upload
         if form.avatar.data:
+            # Additional server-side file size validation
+            max_size = current_app.config.get('AVATARS_MAX_CONTENT_LENGTH', 4 * 1024 * 1024)
+
+            # Check file size
+            form.avatar.data.seek(0, 2)  # Seek to end
+            file_size = form.avatar.data.tell()
+            form.avatar.data.seek(0)  # Seek back to beginning
+
+            if file_size > max_size:
+                size_mb = max_size / (1024 * 1024)
+                flash(f'Размер файла аватара не должен превышать {size_mb:.1f} МБ', 'error')
+                return render_template('user/edit_profile.html', title='Редактирование профиля', form=form)
+
+            # Check file extension
+            allowed_extensions = current_app.config.get('AVATARS_ALLOWED_EXTENSIONS', {'png', 'jpg', 'jpeg'})
+            filename = form.avatar.data.filename.lower()
+            if not any(filename.endswith('.' + ext) for ext in allowed_extensions):
+                flash('Недопустимый формат файла. Разрешены только PNG, JPG, JPEG', 'error')
+                return render_template('user/edit_profile.html', title='Редактирование профиля', form=form)
+
             # Delete old avatar files if it's not the default
             if current_user.avatar_filename != 'default.jpg':
                 User.delete_avatar_files(current_user.avatar_filename)

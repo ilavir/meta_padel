@@ -47,15 +47,15 @@ class TestingConfig(Config):
     WTF_CSRF_ENABLED = False  # Disable CSRF for testing
     SQLALCHEMY_DATABASE_URI = 'sqlite:///:memory:'
     SECRET_KEY = 'test-secret-key-for-testing-only'
-    
+
     # Override upload settings for testing
     UPLOAD_FOLDER = os.path.join(BASEDIR, 'tests', 'temp_uploads')
     AVATARS_FOLDER = os.path.join(BASEDIR, 'tests', 'temp_uploads', 'avatars')
     AVATARS_MAX_CONTENT_LENGTH = 1 * 1024 * 1024  # 1MB for testing
-    
+
     # Disable Sentry for testing
     SENTRY_FLASK_DSN = None
     SENTRY_ENVIRONMENT = 'testing'
-    
+
     # Login settings for testing
     LOGIN_DISABLED = False  # Keep login enabled for testing auth flows
