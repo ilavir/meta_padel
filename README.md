@@ -128,9 +128,45 @@ The application runs with the following services:
 
 ### Running Tests
 
+The application includes a comprehensive test suite using pytest.
+
 ```bash
-# Add test commands here when available
+# Install test dependencies
+pip install -r requirements-test.txt
+
+# Run all tests
+python run_tests.py
+
+# Or run tests manually
+FLASK_ENV=testing python -m pytest tests/ -v
+
+# Run specific test file
+FLASK_ENV=testing python -m pytest tests/test_basic.py -v
+
+# Run with coverage
+FLASK_ENV=testing python -m pytest tests/ --cov=app --cov-report=html
 ```
+
+#### Test Structure
+
+```
+tests/
+├── conftest.py           # Test configuration and fixtures
+├── test_basic.py         # Basic application tests
+├── test_models.py        # Database model tests
+├── test_user_routes.py   # User authentication tests
+├── test_rating_routes.py # Rating system tests
+├── test_forms.py         # Form validation tests
+└── test_utils.py         # Utility function tests
+```
+
+#### Test Configuration
+
+Tests use the `TestingConfig` which:
+- Uses in-memory SQLite database
+- Disables CSRF protection
+- Uses temporary upload directories
+- Provides isolated test environment
 
 ### Database Migrations
 
