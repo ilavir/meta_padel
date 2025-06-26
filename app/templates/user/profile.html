@@ -48,6 +48,7 @@
     {% endif %}
 
     {% if scores %}
+    {% if user == current_user or current_user.has_any_role(['admin', 'superadmin']) %}
     <div class="row mb-2">
         <div class="col">
             <h2 class="text-center mb-2">Последние 10 начислений</h2>
@@ -80,6 +81,7 @@
 
         </div>
     </div>
+    {% endif %}
     {% endif %}
 </div>
 {% endblock %}
