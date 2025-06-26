@@ -48,8 +48,6 @@ def edit_user(user_id):
         form.roles.choices = [(role.id, role.name) for role in roles if role.name not in ['superadmin', 'admin']]
 
     if form.validate_on_submit():
-        logger.debug(form.data)
-
         # update user
         user.update_from_dict(form.data)
 

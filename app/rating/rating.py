@@ -61,23 +61,6 @@ def index():
     return render_template('rating/index.html', title='Рейтинг игроков', gender=gender, players=ranked_players)
 
 
-# @bp.route('/<int:user_id>/add_score')
-# @login_required
-# @role_required(['superadmin', 'admin'])
-# def add_score(user_id):
-#     user = db.get_or_404(User, user_id)
-
-#     score = request.args.get('score', None)
-#     comment = request.args.get('comment', None)
-
-#     user.add_score(score, comment)
-#     logger.info(f'Added score {score} for user "{user.email}" by {current_user.email}')
-#     flash(f'Добавлено {score} очков игроку "{user.name}"')
-#     db.session.commit()
-
-#     return redirect(url_for('rating.index'))
-
-
 @bp.route('/update-rankings')
 @login_required
 @role_required(['superadmin', 'admin'])

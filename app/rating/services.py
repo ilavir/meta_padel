@@ -12,7 +12,7 @@ def take_rank_snapshot(rank_type: str):
     Calculates current ranks for a given rank_type and saves them to RankHistory.
     :param rank_type: 'all', 'male', or 'female'
     """
-    logger.info(f'Taking rank snapshot for {rank_type} players...')
+    # logger.info(f'Taking rank snapshot for {rank_type} players...')
     if rank_type in ['male', 'female']:
         users_query = sa.select(User).where(User.active, User.gender == rank_type)
     elif rank_type == 'all':
