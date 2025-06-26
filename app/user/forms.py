@@ -43,6 +43,11 @@ class RegistrationForm(FlaskForm):
                          validators=[DataRequired(message='Обязательное поле')])
     submit = SubmitField('Зарегистрироваться')
 
+    def validate_username(self, username):
+        user = db.session.scalar(sa.select(User).where(User.username == username.data))
+        if user is not None:
+            raise ValidationError('Пожалуйста, укажите другое имя пользователя')
+
     def validate_email(self, email):
         user = db.session.scalar(sa.select(User).where(User.email == email.data))
         if user is not None:
@@ -79,8 +84,14 @@ class EditProfileForm(FlaskForm):
 
     submit = SubmitField('Сохранить')
 
+    def validate_username(self, username):
+        user = db.session.scalar(sa.select(User).where(sa.and_(User.username == username.data,
+                                                               User.id != current_user.id)))
+        if user is not None:
+            raise ValidationError('Пожалуйста, укажите другое имя пользователя')
+
     def validate_email(self, email):
-        user = db.session.scalar(sa.select(User).where(sa.and_(User.email == self.email.data,
+        user = db.session.scalar(sa.select(User).where(sa.and_(User.email == email.data,
                                                                User.id != current_user.id)))
         if user is not None:
             raise ValidationError('Пожалуйста, укажите другой адрес электронной почты')
