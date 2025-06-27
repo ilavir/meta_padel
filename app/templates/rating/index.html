@@ -38,7 +38,7 @@
                 </thead>
                 <tbody>
                     {% for player in players %}
-                    <tr class="{{ 'table-warning' if player.user.id == current_user.id }}">
+                    <tr class="{{ 'table-secondary' if player.user.id == current_user.id }}">
                         <th scope="row">{{ player.rank }}</th>
                         <td>
                             {% if player.rank_change is not none %}
@@ -59,7 +59,13 @@
                                 class="rounded-circle"
                                 style="width: 30px; height: 30px; object-fit: cover;">
                         </td>
-                        <td><a href="{{ url_for('user.profile', username=player.user.username) }}">{{ player.user.name }}</a></td>
+                        <td>
+                            {% if player.user == current_user %}
+                                {{ player.user.name }}
+                            {% else %}
+                                <a href="{{ url_for('user.profile', username=player.user.username) }}">{{ player.user.name }}</a>
+                            {% endif %}
+                        </td>
                         <td class="text-end">{{ player.user.total_score }}</td>
                     </tr>
                     {% endfor %}
