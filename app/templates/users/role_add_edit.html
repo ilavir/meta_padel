@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% from "_delete_confirmation_modal.html" import delete_confirmation_modal %}
 
 {% block content %}
 <form action="" method="post" novalidate class="container my-4">
@@ -25,10 +26,14 @@
         </div>
         {% if action == 'edit' %}
         <div class="col text-end">
-            <a href="{{ url_for('users.delete_role', role_id=role.id) }}" class="btn btn-danger">Удалить</a>
+            <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#deleteModal">Удалить</button>
         </div>
         {% endif %}
     </div>
 </form>
+
+{% if action == 'edit' %}
+{{ delete_confirmation_modal('Вы уверены, что хотите удалить эту роль? Это действие нельзя отменить.', url_for('users.delete_role', role_id=role.id)) }}
+{% endif %}
 
 {% endblock %}
