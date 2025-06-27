@@ -35,11 +35,17 @@ class ProductionConfig(Config):
     SQLALCHEMY_DATABASE_URI = f"mysql+pymysql://{DB_USER}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/{DB_NAME}"
     SENTRY_ENVIRONMENT = 'production'
 
+    # Scheduler enabled by environment variable in production
+    SCHEDULER_ENABLED = os.environ.get('SCHEDULER_ENABLED', 'false').lower() == 'true'
+
 
 class DevelopmentConfig(Config):
     SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL') or \
         'sqlite:///' + os.path.join(BASEDIR, 'app.db')
     SENTRY_ENVIRONMENT = 'development'
+
+    # Scheduler disabled in development
+    SCHEDULER_ENABLED = False
 
 
 class TestingConfig(Config):
@@ -59,3 +65,6 @@ class TestingConfig(Config):
 
     # Login settings for testing
     LOGIN_DISABLED = False  # Keep login enabled for testing auth flows
+
+    # Scheduler disabled in testing
+    SCHEDULER_ENABLED = False

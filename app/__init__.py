@@ -33,6 +33,11 @@ def register_extensions(app):
     login.login_view = 'user.login'
     login.login_message = u"Пожалуйста, войдите в систему, чтобы получить доступ к этой странице."
 
+    # Initialize scheduler if enabled
+    if app.config.get('SCHEDULER_ENABLED', False):
+        from app.scheduler import init_scheduler
+        init_scheduler(app)
+
 
 def register_blueprints(app):
     from app.user import bp as user_bp
