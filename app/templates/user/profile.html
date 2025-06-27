@@ -18,15 +18,18 @@
             {% endif %}
         </div>
         <div class="col">
+            <p><strong>Имя</strong>: {{ user.name }}</p>
+
+            {% if user == current_user or current_user.has_any_role(['superadmin', 'admin']) %}
             <p><strong>Логин</strong>: {{ user.username }}<br>
             <strong>Email</strong>: {{ user.email }}<br>
-            <strong>Имя</strong>: {{ user.name }}<br>
             <strong>Пол</strong>: {{ 'Мужской' if user.gender == 'male' else 'Женский' if user.gender == 'female' else '' }}<br>
-            <strong>Телефон</strong>: {{ user.phone }}</p>
-            {% if user.about_me %}<p><strong>О себе</strong>: {{ user.about_me }}</p>{% endif %}
-
-            <p><strong>Дата регистрации</strong>: {{ user.created_at }}<br>
+            <strong>Телефон</strong>: {{ user.phone }}<br><br>
+            <strong>Дата регистрации</strong>: {{ user.created_at }}<br>
             {% if user.last_seen %}<strong>Последний визит</strong>: {{ user.last_seen }}{% endif %}</p>
+            {% endif %}
+
+            {% if user.about_me %}<p><strong>О себе</strong>: {{ user.about_me }}</p>{% endif %}
         </div>
         {% if current_user.has_any_role(['superadmin', 'admin']) %}
         <div class="col-auto">
