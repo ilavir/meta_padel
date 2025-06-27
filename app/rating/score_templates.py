@@ -20,7 +20,7 @@ def score_templates():
 
     templates = db.session.scalars(
         sa.select(ScoreTemplate)
-        .order_by(sa.desc(ScoreTemplate.created_at))
+        .order_by(sa.desc(ScoreTemplate.score))
     ).all()
 
     return render_template('rating/score_templates.html', title='Шаблоны очков', templates=templates)

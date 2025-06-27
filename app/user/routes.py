@@ -96,7 +96,10 @@ def profile(username):
     scores = user.scores
     scores = sorted(scores, key=lambda score: score.created_at, reverse=True)[:10]
 
-    score_templates = db.session.scalars(sa.select(ScoreTemplate)).all()
+    score_templates = db.session.scalars(
+            sa.select(ScoreTemplate)
+            .order_by(sa.desc(ScoreTemplate.score))
+        ).all()
     apply_score_form = ApplyScoreTemplateForm()
 
     return render_template('user/profile.html', title='Профиль',
