@@ -20,15 +20,17 @@
         </div>
     </div>
     <div class="row mt-4">
-        <div class="col">
-            <a href="{{ url_for('rating.score_templates') }}" class="btn btn-secondary">Отменить</a>
-            {{ form.submit(class="btn btn-purple") }}
+        <div class="col d-flex justify-content-between flex-wrap gap-2">
+            <div>
+                <a href="{{ url_for('rating.score_templates') }}" class="btn btn-secondary btn-sm me-2">Отменить</a>
+                {{ form.submit(class="btn btn-purple btn-sm") }}
+            </div>
+            {% if action == 'edit' %}
+            <div>
+                <button type="button" class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#deleteModal">Удалить</button>
+            </div>
+            {% endif %}
         </div>
-        {% if action == 'edit' %}
-        <div class="col text-end">
-            <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#deleteModal">Удалить</button>
-        </div>
-        {% endif %}
     </div>
 </form>
 

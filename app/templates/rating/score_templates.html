@@ -9,7 +9,7 @@
     </div>
     <div class="row mb-3">
         <div class="col text-end">
-            <a href="{{ url_for('rating.add_score_template') }}" class="btn btn-purple">Добавить шаблон</a>
+            <a href="{{ url_for('rating.add_score_template') }}" class="btn btn-purple btn-sm">Добавить шаблон</a>
         </div>
     </div>
     <div class="row">
@@ -29,7 +29,7 @@
                     <tr>
                         <td scope="row">{{ template.name }}</td>
                         <td class="text-end">{{ template.score }}</td>
-                        <td>
+                        <td class="text-end">
                             <a href="{{ url_for('rating.edit_score_template', template_id=template.id) }}" class="btn btn-purple btn-sm">
                                 <i class="fas fa-edit"></i> Изменить
                             </a>
