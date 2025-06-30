@@ -5,17 +5,18 @@ import os
 
 logger = logging.getLogger(__name__)
 
-# Store app instance for scheduler jobs
-_app_instance = None
-
 
 def update_rankings_job():
     """Job function to update rankings by calling the service function directly"""
     try:
-        # Import here to avoid circular imports
+        # Import the factory and the service
+        from app import create_app  # <-- Import the factory
         from app.rating.services import take_rank_snapshot
 
-        with _app_instance.app_context():
+        # Create a new app instance just for this job
+        app = create_app()
+
+        with app.app_context():
             # Update rankings for all gender types
             take_rank_snapshot('all')
             take_rank_snapshot('male')
@@ -29,9 +30,6 @@ def update_rankings_job():
 
 def init_scheduler(app):
     """Initialize the scheduler with the Flask app"""
-    global _app_instance
-    _app_instance = app
-
     if not app.config.get('SCHEDULER_ENABLED', False):
         return
 
@@ -60,7 +58,7 @@ def init_scheduler(app):
     # Schedule daily at 23:00 UTC
     scheduler.add_job(
         func=update_rankings_job,
-        trigger=CronTrigger(hour=23, minute=0, timezone='UTC'),
+        trigger=CronTrigger(hour=9, minute=0, timezone='UTC'),
         id='update_rankings_daily',
         name='Update rankings daily at 23:00 UTC',
         replace_existing=True
