@@ -58,7 +58,7 @@ def init_scheduler(app):
     # Schedule daily at 23:00 UTC
     scheduler.add_job(
         func=update_rankings_job,
-        trigger=CronTrigger(hour=9, minute=0, timezone='UTC'),
+        trigger=CronTrigger(hour=23, minute=0, timezone='UTC'),
         id='update_rankings_daily',
         name='Update rankings daily at 23:00 UTC',
         replace_existing=True
