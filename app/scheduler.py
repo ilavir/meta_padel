@@ -2,9 +2,11 @@ from apscheduler.schedulers.background import BackgroundScheduler
 from apscheduler.triggers.cron import CronTrigger
 import logging
 import os
-from flask import current_app
 
 logger = logging.getLogger(__name__)
+
+# Store app instance for scheduler jobs
+_app_instance = None
 
 
 def update_rankings_job():
@@ -13,7 +15,7 @@ def update_rankings_job():
         # Import here to avoid circular imports
         from app.rating.services import take_rank_snapshot
 
-        with current_app.app_context():
+        with _app_instance.app_context():
             # Update rankings for all gender types
             take_rank_snapshot('all')
             take_rank_snapshot('male')
@@ -27,6 +29,9 @@ def update_rankings_job():
 
 def init_scheduler(app):
     """Initialize the scheduler with the Flask app"""
+    global _app_instance
+    _app_instance = app
+
     if not app.config.get('SCHEDULER_ENABLED', False):
         return
 
