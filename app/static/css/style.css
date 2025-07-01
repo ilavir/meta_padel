@@ -64,3 +64,23 @@ h1, h2 {
     --bs-btn-disabled-bg: #a0cd3f;
     --bs-btn-disabled-border-color: #a0cd3f;
 }
+
+body {
+    font-family: 'Montserrat',Arial,sans-serif;
+    font-weight: 400;
+}
+
+h1, h2 {
+    font-family: 'Alumni Sans',Arial,sans-serif;
+    font-style: italic;
+    font-weight: 700;
+    text-transform: uppercase;
+}
+
+h1 {
+    font-size: 47px;
+}
+
+h2 {
+    font-size: 35px;
+}

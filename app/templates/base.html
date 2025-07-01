@@ -11,10 +11,12 @@
         {% else %}
         <title>Meta Padel</title>
         {% endif %}
-        <!-- <link rel="shortcut icon" href="{{ url_for('static', filename='img/favicon.ico') }}" type="image/x-icon"> -->
+        <link rel="shortcut icon" href="{{ url_for('static', filename='img/shortcut.svg') }}" type="image/x-icon">
         <link href="{{ url_for('static', filename='css/bootstrap.min.css') }}" rel="stylesheet">
         <link href="{{ url_for('static', filename='css/bootstrap-icons.min.css') }}" rel="stylesheet">
         <link href="{{ url_for('static', filename='css/style.css') }}" rel="stylesheet">
+        <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@100..900&subset=latin,cyrillic" rel="stylesheet">
+        <link href="https://fonts.googleapis.com/css2?family=Alumni+Sans:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
     {% endblock %}
 </head>
 <body>
@@ -25,7 +27,6 @@
                 <a class="navbar-brand" href="{{ url_for('rating.index') }}">
                 <img src="{{ url_for('static', filename='img/logo.png') }}" alt="Meta Padel" width="75" height="40">
                 </a>
-            <!-- <a class="navbar-brand" href="{{ url_for('rating.index') }}">Meta Paddle</a> -->
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
             </button>
