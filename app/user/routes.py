@@ -3,11 +3,12 @@ from urllib.parse import urlsplit
 from flask import render_template, redirect, url_for, flash, request, current_app
 from flask_login import current_user, login_user, logout_user, login_required
 from . import bp
-from .forms import LoginForm, RegistrationForm, EditProfileForm
+from .forms import LoginForm, RegistrationForm, EditProfileForm, ResetPasswordRequestForm, ResetPasswordForm
 import sqlalchemy as sa
 from app import db
 from app.models import User, Role, ScoreTemplate
 from app.rating.forms import ApplyScoreTemplateForm
+from app.email import send_password_reset_email
 
 
 logger = logging.getLogger(__name__)
@@ -167,3 +168,48 @@ def edit_profile():
         return redirect(url_for('user.my_profile'))
 
     return render_template('user/edit_profile.html', title='Редактирование профиля', form=form)
+
+
+@bp.route('/reset_password_request', methods=['GET', 'POST'])
+def reset_password_request():
+    if current_user.is_authenticated:
+        return redirect(url_for('rating.index'))
+
+    form = ResetPasswordRequestForm()
+
+    if form.validate_on_submit():
+        user = db.session.scalar(sa.select(User).where(User.email == form.email.data))
+        if user:
+            logger.info(f'Password reset requested for user: {user.email}')
+            send_password_reset_email(user)
+        else:
+            logger.warning(f'Password reset requested for non-existing user: {form.email.data}')
+
+        flash('Письмо с инструкциями по сбросу пароля отправлено')
+        return redirect(url_for('user.login'))
+
+    return render_template('user/reset_password_request.html', title='Сброс пароля', form=form)
+
+
+@bp.route('/reset_password/<token>', methods=['GET', 'POST'])
+def reset_password(token):
+    if current_user.is_authenticated:
+        return redirect(url_for('rating.index'))
+
+    user = User.verify_reset_password_token(token)
+    if not user:
+        logger.warning(f'Invalid password reset token: {token}')
+        return redirect(url_for('rating.index'))
+
+    form = ResetPasswordForm()
+
+    if form.validate_on_submit():
+        user.set_password(form.password.data)
+        db.session.commit()
+
+        logger.info(f'Password reset for user: {user.email}')
+        flash(f'Пароль для пользователя {user.email} изменён')
+
+        return redirect(url_for('user.login'))
+
+    return render_template('user/reset_password.html', title='Новый пароль', form=form)

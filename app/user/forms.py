@@ -137,3 +137,23 @@ class EditProfileForm(FlaskForm):
                                                                User.id != current_user.id)))
         if user is not None:
             raise ValidationError('Пожалуйста, укажите другой адрес электронной почты')
+
+
+class ResetPasswordRequestForm(FlaskForm):
+    email = StringField('Email', validators=[
+        DataRequired(message='Обязательное поле'),
+        Email(message='Некорректный адрес электронной почты')])
+    submit = SubmitField('Сбросить пароль')
+
+
+class ResetPasswordForm(FlaskForm):
+    PASSWORD_MAX_LENGTH = 30
+
+    password = PasswordField('Пароль', validators=[
+        DataRequired(message='Обязательное поле'),
+        Length(max=PASSWORD_MAX_LENGTH, message=f'Поле не может содержать более {PASSWORD_MAX_LENGTH} символов')])
+    password2 = PasswordField('Повтор пароля', validators=[
+        DataRequired(message='Обязательное поле'),
+        Length(max=PASSWORD_MAX_LENGTH, message=f'Поле не может содержать более {PASSWORD_MAX_LENGTH} символов'),
+        EqualTo('password', message='Пароли не совпадают')])
+    submit = SubmitField('Установить пароль')

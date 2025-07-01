@@ -1,6 +1,6 @@
 import os
 import logging
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import Optional, Iterable
 import sqlalchemy as sa
 import sqlalchemy.orm as so
@@ -10,6 +10,7 @@ from flask_login import UserMixin
 from werkzeug.security import generate_password_hash, check_password_hash
 import secrets
 from PIL import Image
+import jwt
 
 logger = logging.getLogger(__name__)
 
@@ -72,6 +73,20 @@ class User(UserMixin, BaseModel):
 
     def check_password(self, password):
         return check_password_hash(self.password_hash, password)
+
+    def get_reset_password_token(self, expires_in=600):
+        return jwt.encode(
+            {'user_id': self.id, 'exp': int(datetime.now(timezone.utc).timestamp()) + expires_in},
+            current_app.config['SECRET_KEY'], algorithm='HS256')
+
+    @staticmethod
+    def verify_reset_password_token(token):
+        try:
+            user_id = jwt.decode(token, current_app.config['SECRET_KEY'],
+                                 algorithms=['HS256'])['user_id']
+        except Exception:
+            return None
+        return db.session.get(User, user_id)
 
     def has_role(self, role_name: str) -> bool:
         """Check if user has specific role"""

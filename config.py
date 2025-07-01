@@ -38,6 +38,14 @@ class ProductionConfig(Config):
     # Scheduler enabled by environment variable in production
     SCHEDULER_ENABLED = os.environ.get('SCHEDULER_ENABLED', 'false').lower() == 'true'
 
+    # Email settings
+    MAIL_SERVER = os.environ.get('MAIL_SERVER')
+    MAIL_PORT = os.environ.get('MAIL_PORT')
+    MAIL_USE_TLS = os.environ.get('MAIL_USE_TLS')
+    MAIL_USERNAME = os.environ.get('MAIL_USERNAME')
+    MAIL_PASSWORD = os.environ.get('MAIL_PASSWORD')
+    MAIL_DEFAULT_SENDER = os.environ.get('MAIL_DEFAULT_SENDER') or 'test@example.com'
+
 
 class DevelopmentConfig(Config):
     SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL') or \
@@ -46,6 +54,11 @@ class DevelopmentConfig(Config):
 
     # Scheduler disabled in development
     SCHEDULER_ENABLED = False
+
+    # Email settings for aiosmtpd
+    MAIL_SERVER = 'localhost'
+    MAIL_PORT = 8025
+    MAIL_DEFAULT_SENDER = os.environ.get('MAIL_DEFAULT_SENDER') or 'test@example.com'
 
 
 class TestingConfig(Config):
@@ -68,3 +81,7 @@ class TestingConfig(Config):
 
     # Scheduler disabled in testing
     SCHEDULER_ENABLED = False
+
+    # Email settings
+    EMAIL_HOST = 'localhost'
+    EMAIL_PORT = 8025
