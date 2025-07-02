@@ -1,5 +1,6 @@
 import logging
 from urllib.parse import urlsplit
+import random
 from flask import render_template, redirect, url_for, flash, request, current_app
 from flask_login import current_user, login_user, logout_user, login_required
 from . import bp
@@ -75,7 +76,15 @@ def register():
         logger.debug(f'Registration form submitted. Email: {form.email.data}')
 
         user = User.from_dict(form.data)
-        user.username = form.email.data.split('@')[0][:64]
+        base_username = form.email.data.split('@')[0][:20]
+
+        # Generate unique username
+        username = base_username
+        while db.session.scalar(sa.select(User).where(User.username == username)):
+            random_suffix = random.randint(100, 999)
+            username = f"{base_username}_{random_suffix}"
+
+        user.username = username
         user.roles.append(db.session.scalar(sa.select(Role).where(Role.name == 'player')))
         db.session.add(user)
         db.session.commit()
