@@ -12,7 +12,7 @@
             <img src="{{ user.get_avatar_url('medium') }}"
                          alt="{{ user.name }}"
                          class="rounded-circle mb-3"
-                         style="width: 150px; height: 150px; object-fit: cover;">
+                         style="width: 200px; height: 200px; object-fit: cover;">
             {% if user == current_user %}
             <div><a href="{{ url_for('user.edit_profile') }}" class="btn btn-sm btn-purple">Редактировать профиль</a></div>
             {% endif %}
