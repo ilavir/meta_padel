@@ -124,8 +124,8 @@ def apply_score_template():
         flash(f'Добавлено {template.score} очков игроку "{user.name}"')
 
         # Update rankings
-        take_rank_snapshot('all')
-        if user.gender:
-            take_rank_snapshot(user.gender)
+        # take_rank_snapshot('all')
+        # if user.gender:
+        #     take_rank_snapshot(user.gender)
 
     return redirect(url_for('user.profile', username=user.username))
