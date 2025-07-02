@@ -25,8 +25,8 @@
             <strong>Email</strong>: {{ user.email }}<br>
             <strong>Пол</strong>: {{ 'Мужской' if user.gender == 'male' else 'Женский' if user.gender == 'female' else '' }}<br>
             <strong>Телефон</strong>: {{ user.phone }}<br><br>
-            <strong>Дата регистрации</strong>: {{ user.created_at }}<br>
-            {% if user.last_seen %}<strong>Последний визит</strong>: {{ user.last_seen }}{% endif %}</p>
+            <strong>Дата регистрации</strong>: {{ moment(user.created_at).format('LL') }}<br>
+            {% if user.last_seen %}<strong>Последний визит</strong>: {{ moment(user.last_seen).format('LL') }}{% endif %}</p>
             {% endif %}
 
             {% if user.about_me %}<p><strong>О себе</strong>: {{ user.about_me }}</p>{% endif %}
@@ -71,9 +71,9 @@
                     <tbody>
                         {% for score in scores %}
                         <tr>
-                            <td scope="row" class="d-none d-sm-table-cell">{{ score.created_at.strftime('%Y-%m-%d') }}</td>
+                            <td scope="row" class="d-none d-sm-table-cell">{{ moment(score.created_at).format('L') }}</td>
                             <td>
-                                <div class="d-sm-none small text-muted">{{ score.created_at.strftime('%Y-%m-%d') }}</div>
+                                <div class="d-sm-none small text-muted">{{ moment(score.created_at).format('L') }}</div>
                                 {{ score.comment }}
                             </td>
                             <td class="text-end">{{ score.score }}</td>

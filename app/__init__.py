@@ -6,6 +6,7 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 from flask_login import LoginManager
 from flask_mail import Mail
+from flask_moment import Moment
 from config import ProductionConfig, DevelopmentConfig, TestingConfig
 import sentry_sdk
 
@@ -16,6 +17,7 @@ db = SQLAlchemy()
 migrate = Migrate()
 login = LoginManager()
 mail = Mail()
+moment = Moment()
 
 
 def register_extensions(app):
@@ -35,6 +37,7 @@ def register_extensions(app):
     login.login_view = 'user.login'
     login.login_message = u"Пожалуйста, войдите в систему, чтобы получить доступ к этой странице."
     mail.init_app(app)
+    moment.init_app(app)
 
     # Initialize scheduler if enabled
     if app.config.get('SCHEDULER_ENABLED', False):
