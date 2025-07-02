@@ -38,7 +38,7 @@
                                 {{ role.name }}{% if not loop.last %}, {% endif %}
                                 {% endfor %}
                             </td>
-                            <td>{{ user.created_at }}</td>
+                            <td>{{ moment(user.created_at).format('lll') }}</td>
                             <td class="{{ 'text-danger' if not user.active }}">{{ 'Да' if user.active else 'Нет' }}</td>
                             <td class="text-end">
                                 {% if user.has_any_role(['superadmin', 'admin']) and current_user.has_role('superadmin') %}
