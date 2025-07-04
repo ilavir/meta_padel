@@ -8,13 +8,13 @@ This document describes the testing infrastructure set up for the Meta Padel Rat
 
 ```
 tests/
-├── __init__.py           # Tests package marker
 ├── conftest.py           # Test configuration and fixtures
-├── test_basic.py         # Basic application setup tests
-├── test_run_simple.py    # Simple model and route tests
-├── pytest.ini            # Pytest configuration
-├── requirements-test.txt # Testing dependencies
-└── run_tests.py          # Test runner script
+├── test_basic.py         # Basic application tests
+├── test_models.py        # Database model tests
+├── test_user_routes.py   # User authentication tests
+├── test_rating_routes.py # Rating system tests
+├── test_forms.py         # Form validation tests
+└── test_utils.py         # Utility function tests
 ```
 
 ## Configuration
