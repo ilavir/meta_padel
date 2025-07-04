@@ -35,7 +35,7 @@ class User(UserMixin, BaseModel):
     about_me: so.Mapped[Optional[str]] = so.mapped_column(sa.String(256), default=None)
     avatar_filename: so.Mapped[str] = so.mapped_column(sa.String(64), server_default='default.jpg')
     password_hash: so.Mapped[Optional[str]] = so.mapped_column(sa.String(256))
-    active: so.Mapped[bool] = so.mapped_column(sa.Boolean, default=False)
+    active: so.Mapped[bool] = so.mapped_column(sa.Boolean, default=True)
     last_seen: so.Mapped[Optional[datetime]] = so.mapped_column(sa.DateTime, default=None)
 
     roles: so.Mapped[list['Role']] = so.relationship(secondary='user_roles', back_populates='users')
