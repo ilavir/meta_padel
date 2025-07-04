@@ -63,9 +63,12 @@
                 <table class="table table-sm table-hover">
                     <thead>
                         <tr>
-                            <th scope="col" class="d-none d-sm-table-cell">Дата</th>
+                            <th scope="col" class="d-none d-sm-table-cell col-1">Дата</th>
                             <th scope="col">Комментарий</th>
-                            <th scope="col" class="text-end">Очки</th>
+                            {% if current_user.has_any_role(['superadmin']) %}
+                            <th scope="col" class="d-none d-sm-table-cell col-2">Начислил</th>
+                            {% endif %}
+                            <th scope="col" class="text-end col-1">Очки</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -76,6 +79,9 @@
                                 <div class="d-sm-none small text-muted">{{ moment(score.created_at).format('L') }}</div>
                                 {{ score.comment }}
                             </td>
+                            {% if current_user.has_any_role(['superadmin']) %}
+                            <td class="d-none d-sm-table-cell"><a href="{{ url_for('user.profile', username=score.creator.username) }}">{{ score.creator.name }}</a></td>
+                            {% endif %}
                             <td class="text-end">{{ score.score }}</td>
                         </tr>
                         {% endfor %}
