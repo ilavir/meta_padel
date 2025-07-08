@@ -179,6 +179,19 @@ def edit_profile():
     return render_template('user/edit_profile.html', title='Редактирование профиля', form=form)
 
 
+@bp.route('/me/delete_avatar', methods=['GET'])
+@login_required
+def delete_avatar():
+    if current_user.avatar_filename != 'default.jpg':
+        User.delete_avatar_files(current_user.avatar_filename)
+        current_user.avatar_filename = 'default.jpg'
+        db.session.commit()
+        logger.info(f'Avatar deleted for user: {current_user.email}')
+        flash('Аватар удалён')
+
+    return redirect(url_for('user.my_profile'))
+
+
 @bp.route('/reset_password_request', methods=['GET', 'POST'])
 def reset_password_request():
     if current_user.is_authenticated:
