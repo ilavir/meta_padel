@@ -26,7 +26,7 @@
             <strong>Пол</strong>: {{ 'Мужской' if user.gender == 'male' else 'Женский' if user.gender == 'female' else '' }}<br>
             <strong>Телефон</strong>: {{ user.phone }}<br><br>
             <strong>Дата регистрации</strong>: {{ moment(user.created_at).format('LL') }}<br>
-            {% if user.last_seen %}<strong>Последний визит</strong>: {{ moment(user.last_seen).fromNow() }}{% endif %}</p>
+            <!-- {% if user.last_seen %}<strong>Последний визит</strong>: {{ moment(user.last_seen).fromNow() }}{% endif %}</p> -->
             {% endif %}
 
             {% if user.about_me %}<p><strong>О себе</strong>: {{ user.about_me }}</p>{% endif %}

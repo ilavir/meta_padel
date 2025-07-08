@@ -15,11 +15,11 @@ from app.email import send_password_reset_email
 logger = logging.getLogger(__name__)
 
 
-@bp.before_app_request
-def before_request():
-    if current_user.is_authenticated:
-        current_user.last_seen = sa.func.now()
-        db.session.commit()
+# @bp.before_app_request
+# def before_request():
+#     if current_user.is_authenticated:
+#         current_user.last_seen = sa.func.now()
+#         db.session.commit()
 
 
 @bp.route('/login', methods=['GET', 'POST'])
