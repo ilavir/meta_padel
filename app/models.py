@@ -170,15 +170,8 @@ class User(UserMixin, BaseModel):
             # Create a copy of the image for this size
             img_copy = img.copy()
 
-            # For non-square dimensions, we'll crop to fit
-            if size_name == 'medium':  # 100x80 - crop to fit
-                img_copy = User._crop_to_fit(img_copy, dimensions)
-            else:  # Square images - use thumbnail (maintains aspect ratio)
-                img_copy.thumbnail(dimensions, Image.Resampling.LANCZOS)
-
-                # If thumbnail doesn't make it square, crop it
-                if img_copy.size != dimensions:
-                    img_copy = User._crop_center(img_copy, dimensions)
+            # Always crop to fit exact dimensions to avoid black bars
+            img_copy = User._crop_to_fit(img_copy, dimensions)
 
             # Save the sized image
             suffix = f"_{size_name}" if size_name != 'medium' else '_medium'

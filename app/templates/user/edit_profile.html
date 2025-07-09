@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% from "_delete_confirmation_modal.html" import delete_confirmation_modal %}
 
 {% block content %}
 <form action="" method="post" enctype="multipart/form-data" novalidate class="container my-4">
@@ -44,7 +45,7 @@
         </div>
         {% if current_user.avatar_filename != 'default.jpg' %}
         <div class="col-auto d-flex align-items-end">
-            <a href="{{ url_for('user.delete_avatar') }}" class="btn btn-outline-danger">Удалить</a>
+            <a href="{{ url_for('user.delete_avatar') }}" class="btn btn-outline-danger" data-bs-toggle="modal" data-bs-target="#deleteModal">Удалить</a>
         </div>
         {% endif %}
     </div>
@@ -55,4 +56,7 @@
         </div>
     </div>
 </form>
+
+{{ delete_confirmation_modal('Вы уверены, что хотите удалить аватар? Это действие нельзя отменить.', url_for('user.delete_avatar')) }}
+
 {% endblock %}
