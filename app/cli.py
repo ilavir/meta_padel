@@ -63,5 +63,3 @@ def regenerate_user(username):
         click.echo(f"✓ Regenerated avatar sizes for {username}")
     else:
         click.echo(f"✗ Failed to regenerate avatar sizes for {username}")
-
-
