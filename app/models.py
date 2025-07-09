@@ -306,7 +306,7 @@ class Score(db.Model):
     user_id: so.Mapped[int] = so.mapped_column(sa.ForeignKey('users.id'), index=True)
     score: so.Mapped[int] = so.mapped_column(sa.Integer)
     comment: so.Mapped[str] = so.mapped_column(sa.String(256))
-    created_by: so.Mapped[int] = so.mapped_column(sa.ForeignKey('users.id', name='fk_scores_created_by'))
+    created_by: so.Mapped[Optional[int]] = so.mapped_column(sa.ForeignKey('users.id', name='fk_scores_created_by'))
     created_at: so.Mapped[datetime] = so.mapped_column(sa.DateTime, server_default=sa.func.now())
 
     # Relationships

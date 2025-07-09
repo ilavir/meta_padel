@@ -129,3 +129,32 @@ def apply_score_template():
         #     take_rank_snapshot(user.gender)
 
     return redirect(url_for('user.profile', username=user.username))
+
+
+@bp.route('/delete-score/<int:score_id>')
+@login_required
+@role_required(['superadmin', 'admin'])
+def delete_score(score_id):
+    """Delete score by ID"""
+    score = db.session.get(Score, score_id)
+    if not score:
+        flash('Начисление не найдено', 'error')
+        return redirect(url_for('rating.index'))
+
+    # Check role-based time restrictions
+    if current_user.has_role('admin') and not current_user.has_role('superadmin'):
+        # Admin can only delete scores from last 24 hours
+        time_limit = datetime.now(timezone.utc) - timedelta(hours=24)
+        score_created_at = score.created_at.replace(tzinfo=timezone.utc) if score.created_at.tzinfo is None else score.created_at
+        if score_created_at < time_limit:
+            flash('Можно удалять только очки за последние 24 часа', 'error')
+            return redirect(url_for('user.profile', username=score.user.username))
+
+    user = score.user
+    db.session.delete(score)
+    db.session.commit()
+
+    logger.info(f'Deleted score {score_id} ({score.score} points) for user "{user.email}" by {current_user.email}')
+    flash(f'Удалено {score.score} очков за "{score.comment}" у игрока "{user.name}"')
+
+    return redirect(url_for('user.profile', username=user.username))

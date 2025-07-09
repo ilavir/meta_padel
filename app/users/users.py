@@ -5,7 +5,7 @@ from . import bp
 from .forms import UserAddEditForm
 import sqlalchemy as sa
 from app import db
-from app.models import User, Role
+from app.models import User, Role, Score, UserRankHistory
 from app.services import role_required
 
 
@@ -79,6 +79,17 @@ def edit_user(user_id):
 def delete_user(user_id):
     user = db.get_or_404(User, user_id)
 
+    # nullify created_by for scores created by this user
+    db.session.execute(
+        sa.update(Score).where(Score.created_by == user.id).values(created_by=None)
+    )
+    
+    # delete all scores belonging to this user
+    db.session.execute(sa.delete(Score).where(Score.user_id == user.id))
+    
+    # delete all rank history for this user
+    db.session.execute(sa.delete(UserRankHistory).where(UserRankHistory.user_id == user.id))
+    
     db.session.delete(user)
     db.session.commit()
     logger.info(f'Deleted user "{user.email}"')
