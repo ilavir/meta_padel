@@ -46,7 +46,8 @@
                     {% if current_user.is_anonymous %}
                     <li class="nav-item"><a href="{{ url_for('user.login') }}" class="nav-link">Вход</a></li>
                     {% else %}
-                    <li class="nav-item dropdown">
+                    <!-- Desktop dropdown -->
+                    <li class="nav-item dropdown d-none d-lg-block">
                         <a href="#" class="nav-link dropdown-toggle" role="button" data-bs-toggle="dropdown" aria-expanded="false">{{ current_user.name }}</a>
                         <ul class="dropdown-menu">
                             <li><a href="{{ url_for('user.my_profile') }}" class="dropdown-item">Профиль</a></li>
@@ -54,6 +55,9 @@
                             <li><a href="{{ url_for('user.logout') }}" class="dropdown-item">Выход</a></li>
                         </ul>
                     </li>
+                    <!-- Mobile direct links -->
+                    <li class="nav-item d-lg-none"><a href="{{ url_for('user.my_profile') }}" class="nav-link">Профиль</a></li>
+                    <li class="nav-item d-lg-none"><a href="{{ url_for('user.logout') }}" class="nav-link">Выход</a></li>
                     {% endif %}
                 </ul>
             </div>
