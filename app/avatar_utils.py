@@ -113,12 +113,8 @@ class AvatarManager:
             for size_name, dimensions in AvatarManager.SIZES.items():
                 img_copy = img.copy()
 
-                if size_name == 'medium':  # 100x80 - crop to fit
-                    img_copy = User._crop_to_fit(img_copy, dimensions)
-                else:  # Square images
-                    img_copy.thumbnail(dimensions, Image.Resampling.LANCZOS)
-                    if img_copy.size != dimensions:
-                        img_copy = User._crop_center(img_copy, dimensions)
+                # Always crop to fit exact dimensions to avoid black bars
+                img_copy = User._crop_to_fit(img_copy, dimensions)
 
                 # Save the sized image
                 suffix = f"_{size_name}" if size_name != 'medium' else '_medium'
