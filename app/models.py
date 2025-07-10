@@ -152,7 +152,7 @@ class User(UserMixin, BaseModel):
 
         # Open and process the image
         img = Image.open(form_picture)
-        
+
         # Handle EXIF orientation to prevent rotation issues
         img = ImageOps.exif_transpose(img)
 
