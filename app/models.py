@@ -9,7 +9,7 @@ from flask import url_for, current_app
 from flask_login import UserMixin
 from werkzeug.security import generate_password_hash, check_password_hash
 import secrets
-from PIL import Image
+from PIL import Image, ImageOps
 import jwt
 
 logger = logging.getLogger(__name__)
@@ -152,6 +152,9 @@ class User(UserMixin, BaseModel):
 
         # Open and process the image
         img = Image.open(form_picture)
+        
+        # Handle EXIF orientation to prevent rotation issues
+        img = ImageOps.exif_transpose(img)
 
         # Convert to RGB if necessary (for PNG with transparency)
         if img.mode in ('RGBA', 'LA', 'P'):

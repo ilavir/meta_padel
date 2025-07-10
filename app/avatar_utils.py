@@ -1,6 +1,6 @@
 from flask import current_app, url_for
 import os
-from PIL import Image
+from PIL import Image, ImageOps
 
 
 class AvatarManager:
@@ -98,6 +98,9 @@ class AvatarManager:
         try:
             # Open the source image
             img = Image.open(source_path)
+            
+            # Handle EXIF orientation to prevent rotation issues
+            img = ImageOps.exif_transpose(img)
 
             # Convert to RGB if necessary
             if img.mode in ('RGBA', 'LA', 'P'):
