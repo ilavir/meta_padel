@@ -11,12 +11,29 @@
         {% else %}
         <title>Мета Падел Гродно</title>
         {% endif %}
-        <link rel="shortcut icon" href="{{ url_for('static', filename='img/shortcut.svg') }}" type="image/x-icon">
+
         <link href="{{ url_for('static', filename='css/bootstrap.min.css') }}" rel="stylesheet">
         <link href="{{ url_for('static', filename='css/bootstrap-icons.min.css') }}" rel="stylesheet">
         <link href="{{ url_for('static', filename='css/style.css') }}" rel="stylesheet">
         <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@100..900&subset=latin,cyrillic" rel="stylesheet">
         <link href="https://fonts.googleapis.com/css2?family=Alumni+Sans:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
+
+        <!-- Icons -->
+        <link rel="shortcut icon" href="{{ url_for('static', filename='img/shortcut.svg') }}" type="image/x-icon">
+        <link rel="icon" type="image/png" sizes="512x512" href="{{ url_for('static', filename='img/pwa/icon-512x512.png') }}">
+        <link rel="icon" type="image/png" sizes="192x192" href="{{ url_for('static', filename='img/pwa/icon-192x192.png') }}">
+
+        <!-- PWA Meta Tags -->
+        <meta name="description" content="Система рейтинга игроков в падел - Мета Падел Гродно">
+        <meta name="theme-color" content="#0d6efd">
+        <meta name="mobile-web-app-capable" content="yes">
+        <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+        <meta name="apple-mobile-web-app-title" content="Meta Padel">
+        <meta name="msapplication-TileColor" content="#0d6efd">
+        <!-- <meta name="msapplication-config" content="/static/browserconfig.xml"> -->
+
+        <!-- PWA Manifest -->
+        <link rel="manifest" href="{{ url_for('static', filename='manifest.json') }}">
     {% endblock %}
 </head>
 <body>
@@ -93,6 +110,7 @@
 
     {% block js %}
     <script src="{{ url_for('static', filename='js/bootstrap.bundle.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/pwa.js') }}"></script>
     {{ moment.include_moment() }}
     {{ moment.locale('ru') }}
     {% endblock %}
