@@ -103,7 +103,19 @@
     <footer class="mt-4">
         <div class="container">
             <div class="row">
-                <div class="col p-4 text-center"> &copy; 2025 Все права защищены</div>
+                <div class="col p-4 text-center">
+                    <!-- PWA Install Button - Mobile Only -->
+                    <div id="pwa-install-div" class="mb-3 d-lg-none d-flex justify-content-center" style="display: none;">
+                        <button id="pwa-install-btn"
+                                class="btn btn-outline-purple btn-sm"
+                                onclick="installPWA()"
+                                title="Установить приложение">
+                            <i class="bi bi-download me-1"></i>
+                            Установить приложение
+                        </button>
+                    </div>
+                    &copy; 2025 Все права защищены
+                </div>
             </div>
         </div>
     </footer>

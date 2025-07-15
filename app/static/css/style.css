@@ -48,6 +48,16 @@ h1, h2 {
     --bs-btn-disabled-border-color: #9158a6;
 }
 
+.btn-outline-purple {
+    --bs-btn-color: #9158a6;
+    --bs-btn-border-color: #9158a6;
+    --bs-btn-hover-color: #744685;
+    --bs-btn-hover-border-color: #744685;
+    --bs-btn-active-color: #744685;
+    --bs-btn-active-border-color: #744685;
+    --bs-btn-active-shadow: inset 0 3px 5px rgba(0, 0, 0, 0.125);
+}
+
 .btn-lime {
     --bs-btn-color: #231f20;
     --bs-btn-bg: #a0cd3f;
