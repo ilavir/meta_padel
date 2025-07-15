@@ -4,7 +4,7 @@
   "description": "Система рейтинга игроков в падел",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#212529",
+  "background_color": "#744685",
   "theme_color": "#0d6efd",
   "orientation": "portrait-primary",
   "scope": "/",
