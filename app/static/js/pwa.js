@@ -1,7 +1,5 @@
-// PWA Install functionality
+// PWA Install functionality - Simplified version
 let deferredPrompt;
-let installButtonDiv;
-let isInstallable = false;
 
 // Service Worker registration
 if ('serviceWorker' in navigator) {
@@ -16,79 +14,19 @@ if ('serviceWorker' in navigator) {
     });
 }
 
-// Check if browser supports PWA installation
-function isPWASupported() {
-    // Firefox doesn't support beforeinstallprompt event
-    const isFirefox = navigator.userAgent.toLowerCase().includes('firefox');
-    if (isFirefox) {
-        console.log('Firefox detected - PWA install not supported');
-        return false;
-    }
-    
-    // Check for basic PWA support
-    return 'serviceWorker' in navigator && 'BeforeInstallPromptEvent' in window;
-}
-
-// Check if app is already installed
-function isAppInstalled() {
-    // Multiple checks for installed state
-    const standaloneMode = window.matchMedia('(display-mode: standalone)').matches;
-    const iosStandalone = window.navigator.standalone === true;
-    const androidStandalone = document.referrer.includes('android-app://');
-    
-    return standaloneMode || iosStandalone || androidStandalone;
-}
-
-// Check if app was previously installed (localStorage tracking)
-function wasAppInstalled() {
-    return localStorage.getItem('pwa-installed') === 'true';
-}
-
 // PWA Install prompt handling
 window.addEventListener('beforeinstallprompt', (e) => {
     console.log('beforeinstallprompt event fired');
-    
-    // Don't show if already installed
-    if (isAppInstalled() || wasAppInstalled()) {
-        console.log('App already installed, not showing install prompt');
-        return;
-    }
-    
     // Prevent the mini-infobar from appearing on mobile
     e.preventDefault();
     // Stash the event so it can be triggered later
     deferredPrompt = e;
-    isInstallable = true;
-    // Enable the install button if it exists
-    enableInstallButton();
 });
 
 window.addEventListener('appinstalled', () => {
     console.log('PWA was installed');
-    // Mark as installed in localStorage
-    localStorage.setItem('pwa-installed', 'true');
-    // Disable the install button after successful installation
-    disableInstallButton();
-    isInstallable = false;
     deferredPrompt = null;
 });
-
-function enableInstallButton() {
-    installButtonDiv = document.getElementById('pwa-install-div');
-    const installButton = document.getElementById('pwa-install-btn');
-    if (installButtonDiv && installButton && isPWASupported() && !isAppInstalled() && !wasAppInstalled()) {
-        installButton.disabled = false;
-        console.log('Install button enabled');
-    }
-}
-
-function disableInstallButton() {
-    const installButton = document.getElementById('pwa-install-btn');
-    if (installButton) {
-        installButton.disabled = true;
-        console.log('Install button disabled');
-    }
-}
 
 function installPWA() {
     console.log('Install PWA clicked');
@@ -108,13 +46,10 @@ function installPWA() {
         console.log('User choice:', choiceResult.outcome);
         if (choiceResult.outcome === 'accepted') {
             console.log('User accepted the install prompt');
-            localStorage.setItem('pwa-installed', 'true');
         } else {
             console.log('User dismissed the install prompt');
         }
         deferredPrompt = null;
-        isInstallable = false;
-        disableInstallButton();
     });
 }
 
@@ -138,40 +73,3 @@ function showManualInstallInstructions() {
     
     alert(message);
 }
-
-// Initialize on page load
-document.addEventListener('DOMContentLoaded', () => {
-    console.log('DOM loaded, checking install state');
-    console.log('PWA supported:', isPWASupported());
-    console.log('App installed:', isAppInstalled());
-    console.log('Was app installed:', wasAppInstalled());
-    
-    // Check if install button exists (only for non-logged users)
-    const installButton = document.getElementById('pwa-install-btn');
-    if (!installButton) {
-        console.log('Install button not found - user is logged in');
-        return;
-    }
-    
-    // Initially disable the button until we know if installation is possible
-    installButton.disabled = true;
-    
-    // Don't enable install button if:
-    // - PWA not supported
-    // - App already installed
-    // - App was previously installed
-    if (!isPWASupported() || isAppInstalled() || wasAppInstalled()) {
-        console.log('Install not available due to conditions');
-        installButton.disabled = true;
-        return;
-    }
-    
-    // For supported browsers, wait for beforeinstallprompt event
-    // If event doesn't fire within 3 seconds, keep button disabled
-    setTimeout(() => {
-        if (!isInstallable && !deferredPrompt) {
-            console.log('No install prompt available after timeout');
-            installButton.disabled = true;
-        }
-    }, 3000);
-});

@@ -107,9 +107,8 @@
 
                     <!-- PWA Install Button - Mobile Only -->
                     {% if current_user.is_anonymous %}
-                    <div id="pwa-install-div" class="mb-3 d-lg-none d-flex justify-content-center">
-                        <button id="pwa-install-btn"
-                                class="btn btn-outline-purple btn-sm"
+                    <div class="mb-3 d-lg-none d-flex justify-content-center">
+                        <button class="btn btn-outline-purple btn-sm"
                                 onclick="installPWA()"
                                 title="Установить приложение на устройство">
                             <i class="bi bi-phone me-1"></i>
