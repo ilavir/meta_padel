@@ -1,7 +1,7 @@
 import logging
 from flask_wtf import FlaskForm
 from wtforms import StringField, SubmitField, TelField, EmailField, SelectMultipleField, \
-    BooleanField, SelectField, widgets, TextAreaField
+    BooleanField, SelectField, widgets, TextAreaField, IntegerField
 from wtforms.validators import DataRequired, Length, Email
 
 
@@ -54,3 +54,15 @@ class UserAddEditForm(FlaskForm):
     active: BooleanField = BooleanField('Активен')
     roles: MultiCheckboxField = MultiCheckboxField('Роли', coerce=int)
     submit: SubmitField = SubmitField('Сохранить')
+
+
+class UserFiltersForm(FlaskForm):
+    id = IntegerField('ID')
+    username = StringField('Логин')
+    email = StringField('Email')
+    name = StringField('Имя')
+    phone = StringField('Телефон')
+    gender = SelectField('Пол', choices=[('', ''), ('male', 'Мужской'), ('female', 'Женский')])
+    active = SelectField('Активен', choices=[('', ''), ('true', 'Да'), ('false', 'Нет')])
+    roles = MultiCheckboxField('Роли', coerce=int)
+    submit: SubmitField = SubmitField('Применить')

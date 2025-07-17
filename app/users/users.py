@@ -1,8 +1,9 @@
 import logging
-from flask import render_template, flash, redirect, url_for
+from flask import render_template, flash, redirect, url_for, request
 from flask_login import login_required, current_user
 from . import bp
-from .forms import UserAddEditForm
+from .forms import UserAddEditForm, UserFiltersForm
+from .services import get_query_param, apply_user_filters
 import sqlalchemy as sa
 from app import db
 from app.models import User, Role, Score, UserRankHistory
@@ -17,10 +18,24 @@ logger = logging.getLogger(__name__)
 @login_required
 @role_required(['superadmin', 'admin'])
 def get_users():
-    users = db.session.scalars(sa.select(User)).all()
-    # score_templates = db.session.scalars(sa.select(ScoreTemplate)).all()
+    filters = {
+        'id': get_query_param('id', int),
+        'username': get_query_param('username', str),
+        'email': get_query_param('email', str),
+        'name': get_query_param('name', str),
+        'phone': get_query_param('phone', str),
+        'gender': get_query_param('gender', str),
+        'active': get_query_param('active', str),
+        'roles': get_query_param('roles', str)
+    }
+    form = UserFiltersForm(request.args)
 
-    return render_template('users/users.html', title='Пользователи', users=users)
+    # Create the query with filters applied
+    query = sa.select(User)
+    query = apply_user_filters(query, filters)
+    users = db.session.scalars(query).all()
+
+    return render_template('users/users.html', title='Пользователи', users=users, form=form, filters=filters)
 
 
 # edit User
@@ -83,13 +98,13 @@ def delete_user(user_id):
     db.session.execute(
         sa.update(Score).where(Score.created_by == user.id).values(created_by=None)
     )
-    
+
     # delete all scores belonging to this user
     db.session.execute(sa.delete(Score).where(Score.user_id == user.id))
-    
+
     # delete all rank history for this user
     db.session.execute(sa.delete(UserRankHistory).where(UserRankHistory.user_id == user.id))
-    
+
     db.session.delete(user)
     db.session.commit()
     logger.info(f'Deleted user "{user.email}"')
