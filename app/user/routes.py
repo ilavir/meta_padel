@@ -131,6 +131,17 @@ def my_profile():
                            score_templates=score_templates, apply_score_form=apply_score_form)
 
 
+@bp.route('/id/<int:user_id>')
+@login_required
+def profile_by_id(user_id):
+    user = db.session.scalar(sa.select(User).where(User.id == user_id))
+    if user is None:
+        flash('Пользователь не найден', 'error')
+        return redirect(url_for('rating.index'))
+
+    return redirect(url_for('user.profile', username=user.username))
+
+
 @bp.route('/me/edit', methods=['GET', 'POST'])
 @login_required
 def edit_profile():

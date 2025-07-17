@@ -21,11 +21,13 @@
             <p><strong>Имя</strong>: {{ user.name }}</p>
 
             {% if user == current_user or current_user.has_any_role(['superadmin', 'admin']) %}
-            <p><strong>Логин</strong>: {{ user.username }}<br>
+            <p>
+            <strong>Логин</strong>: {{ user.username }}<br>
             <strong>Email</strong>: {{ user.email }}<br>
             <strong>Пол</strong>: {{ 'Мужской' if user.gender == 'male' else 'Женский' if user.gender == 'female' else '' }}<br>
-            <strong>Телефон</strong>: {{ user.phone }}<br><br>
-            <strong>Дата регистрации</strong>: {{ moment(user.created_at).format('LL') }}<br>
+            <strong>Телефон</strong>: {{ user.phone }}</p>
+            <p><strong>ID</strong>: {{ user.id }}<br>
+            <strong>Дата регистрации</strong>: {{ moment(user.created_at).format('LL') }}</p>
             <!-- {% if user.last_seen %}<strong>Последний визит</strong>: {{ moment(user.last_seen).fromNow() }}{% endif %}</p> -->
             {% endif %}
 
