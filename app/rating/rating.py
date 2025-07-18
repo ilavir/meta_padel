@@ -30,11 +30,6 @@ def index():
     players = [user for user in users if user.has_role('player')]
     players = sorted(players, key=lambda user: user.total_score, reverse=True)
 
-    # Assign current rank and calculate rank change
-    ranked_players = []
-    current_date = datetime.now(timezone.utc).date()
-    yesterday = current_date - timedelta(days=1)
-
     # Fetch all previous day's ranks in a single query
     current_date = datetime.now(timezone.utc).date()
     yesterday = current_date - timedelta(days=1)
