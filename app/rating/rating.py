@@ -35,19 +35,25 @@ def index():
     current_date = datetime.now(timezone.utc).date()
     yesterday = current_date - timedelta(days=1)
 
-    for idx, user in enumerate(players, start=1):
-        # Get the previous day's rank from RankHistory
-        previous_rank_entry = db.session.scalars(
-            sa.select(UserRankHistory)
-            .where(
-                UserRankHistory.user_id == user.id,
-                UserRankHistory.rank_type == rank_type,
-                sa.func.date(UserRankHistory.created_at) == yesterday
-            )
-            .order_by(UserRankHistory.created_at.desc())  # In case there are multiple for yesterday, take the latest
-        ).first()
-        previous_rank = previous_rank_entry.rank if previous_rank_entry else None
+    # Fetch all previous day's ranks in a single query
+    current_date = datetime.now(timezone.utc).date()
+    yesterday = current_date - timedelta(days=1)
 
+    # Get all previous ranks in one query
+    previous_ranks_query = sa.select(UserRankHistory).where(
+        UserRankHistory.user_id.in_([player.id for player in players]),
+        UserRankHistory.rank_type == rank_type,
+        sa.func.date(UserRankHistory.created_at) == yesterday
+    )
+    previous_ranks = db.session.scalars(previous_ranks_query).all()
+
+    # Create a dictionary for quick lookup
+    previous_ranks_dict = {rank.user_id: rank.rank for rank in previous_ranks}
+
+    # Assign current rank and calculate rank change
+    ranked_players = []
+    for idx, user in enumerate(players, start=1):
+        previous_rank = previous_ranks_dict.get(user.id)
         rank_change = None
         if previous_rank is not None:
             rank_change = previous_rank - idx  # Positive if moved up, negative if moved down
@@ -145,7 +151,8 @@ def delete_score(score_id):
     if current_user.has_role('admin') and not current_user.has_role('superadmin'):
         # Admin can only delete scores from last 24 hours
         time_limit = datetime.now(timezone.utc) - timedelta(hours=24)
-        score_created_at = score.created_at.replace(tzinfo=timezone.utc) if score.created_at.tzinfo is None else score.created_at
+        score_created_at = score.created_at.replace(tzinfo=timezone.utc) \
+            if score.created_at.tzinfo is None else score.created_at
         if score_created_at < time_limit:
             flash('Можно удалять только очки за последние 24 часа', 'error')
             return redirect(url_for('user.profile', username=score.user.username))
