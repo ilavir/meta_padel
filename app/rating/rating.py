@@ -6,6 +6,7 @@ from . import bp
 from .services import take_rank_snapshot
 from .forms import ApplyScoreTemplateForm
 import sqlalchemy as sa
+from sqlalchemy.orm import joinedload
 from app import db
 from app.models import User, UserRankHistory, Score, ScoreTemplate
 from app.services import role_required
@@ -21,12 +22,12 @@ def index():
     # make users list for rating: 'male', 'female' or 'all'
     if gender in ['male', 'female']:
         rank_type = gender
-        users_query = sa.select(User).where(User.active, User.gender == gender)
+        users_query = sa.select(User).where(User.active, User.gender == gender).options(joinedload(User.roles))
     else:
         rank_type = 'all'
-        users_query = sa.select(User).where(User.active)
+        users_query = sa.select(User).where(User.active).options(joinedload(User.roles))
 
-    users = db.session.scalars(users_query).all()
+    users = db.session.scalars(users_query).unique().all()
     players = [user for user in users if user.has_role('player')]
     players = sorted(players, key=lambda user: user.total_score, reverse=True)
 
