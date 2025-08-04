@@ -5,6 +5,7 @@ from . import bp
 from .forms import UserAddEditForm, UserFiltersForm
 from .services import get_query_param, apply_user_filters
 import sqlalchemy as sa
+from sqlalchemy.orm import joinedload
 from app import db
 from app.models import User, Role, Score, UserRankHistory
 from app.services import role_required
@@ -31,9 +32,11 @@ def get_users():
     form = UserFiltersForm(request.args)
 
     # Create the query with filters applied
-    query = sa.select(User)
+    query = sa.select(User).options(
+                joinedload(User.roles)
+            )
     query = apply_user_filters(query, filters)
-    users = db.session.scalars(query).all()
+    users = db.session.scalars(query).unique().all()
 
     return render_template('users/users.html', title='Пользователи', users=users, form=form, filters=filters)
 
