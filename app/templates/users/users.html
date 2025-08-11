@@ -1,12 +1,15 @@
 {% extends "base.html" %}
 
 {% block content %}
+
+
 <div class="container my-4">
     <div class="row mb-3">
         <div class="col">
             <h1 class="text-center">{{ title }}</h1>
         </div>
     </div>
+    <!-- filters -->
     <form action="" method="get" novalidate class="row g-2 mb-3 align-items-end">
         <div class="col-md-1 col-sm-4">
             <!-- <label for="{{ form.id.id }}" class="form-label small">{{ form.id.label.text }}</label> -->
@@ -28,6 +31,25 @@
             </div>
         </div>
     </form>
+    <!-- /filters -->
+    <!-- pagination -->
+    {% if pagination.has_prev or pagination.has_next %}
+    <div class="row mt-3">
+        <div class="col">
+            <nav aria-label="Page navigation example">
+            <ul class="pagination justify-content-center">
+                <li class="page-item {{ 'disabled' if not pagination.has_prev }}">
+                <a class="page-link" href="{{ url_for('users.get_users', page=pagination.prev_num, **filters) }}">Назад</a>
+                </li>
+                <li class="page-item {{ 'disabled' if not pagination.has_next }}">
+                <a class="page-link" href="{{ url_for('users.get_users', page=pagination.next_num, **filters) }}">Вперед</a>
+                </li>
+            </ul>
+            </nav>
+        </div>
+    </div>
+    {% endif %}
+    <!-- /pagination -->
     <div class="row">
         <div class="col">
 
@@ -48,7 +70,7 @@
                         </tr>
                     </thead>
                     <tbody>
-                        {% for user in users %}
+                        {% for user in pagination.items %}
                         <tr>
                             <td scope="row">{{ user.id }}</td>
                             <td><a href="{{ url_for('user.profile', username=user.username) }}">{{ user.name }}</a></td>

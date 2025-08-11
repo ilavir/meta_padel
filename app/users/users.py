@@ -1,5 +1,5 @@
 import logging
-from flask import render_template, flash, redirect, url_for, request
+from flask import render_template, flash, redirect, url_for, request, current_app
 from flask_login import login_required, current_user
 from . import bp
 from .forms import UserAddEditForm, UserFiltersForm
@@ -19,6 +19,8 @@ logger = logging.getLogger(__name__)
 @login_required
 @role_required(['superadmin', 'admin'])
 def get_users():
+    page = request.args.get('page', 1, type=int)
+
     filters = {
         'id': get_query_param('id', int),
         'username': get_query_param('username', str),
@@ -36,9 +38,11 @@ def get_users():
                 joinedload(User.roles)
             )
     query = apply_user_filters(query, filters)
-    users = db.session.scalars(query).unique().all()
 
-    return render_template('users/users.html', title='Пользователи', users=users, form=form, filters=filters)
+    users_paginated = db.paginate(query, page=page, per_page=current_app.config['USERS_PER_PAGE'], error_out=False)
+
+    return render_template('users/users.html', title='Пользователи', form=form,
+                           filters=filters, pagination=users_paginated)
 
 
 # edit User
