@@ -22,10 +22,6 @@
     color: #87ad35;
 }
 
-h1, h2 {
-    color: #9158a6;
-}
-
 .form-check-input:checked {
     background-color: #9158a6;
     border-color: #9158a6;
@@ -88,9 +84,19 @@ h1, h2 {
 }
 
 h1 {
+    color: #9158a6;
     font-size: 45px;
 }
 
 h2 {
+    color: #9158a6;
     font-size: 35px;
+}
+
+h3 {
+    font-family: 'Alumni Sans',Arial,sans-serif;
+    font-weight: 600;
+    text-transform: uppercase;
+    color: #87ad35;
+    font-size: 30px;
 }

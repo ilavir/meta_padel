@@ -51,6 +51,7 @@
             <div class="collapse navbar-collapse" id="navbarSupportedContent">
                 <ul class="navbar-nav me-auto mb-2 mb-lg-0">
                     <li class="nav-item"><a href="{{ url_for('rating.index') }}" class="nav-link {{ 'active' if request.endpoint == 'rating.index' }}" {{ 'aria-current=page' if request.endpoint == 'rating.index' }}>Рейтинг</a></li>
+                    <li class="nav-item"><a href="{{ url_for('rating.faq_page') }}" class="nav-link {{ 'active' if request.endpoint == 'rating.faq_page' }}" {{ 'aria-current=page' if request.endpoint == 'rating.faq_page' }}>FAQ</a></li>
                     {% if not current_user.is_anonymous and current_user.has_any_role(['admin', 'superadmin']) %}
                     <li class="nav-item"><a href="{{ url_for('users.get_users') }}" class="nav-link {{ 'active' if request.endpoint == 'users.get_users' }}" {{ 'aria-current=page' if request.endpoint == 'users.get_users' }}>Пользователи</a></li>
                     {% endif %}
