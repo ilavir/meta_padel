@@ -1,6 +1,6 @@
 import logging
 from datetime import datetime, timezone, timedelta
-from flask import render_template, request, redirect, url_for, flash
+from flask import render_template, request, redirect, url_for, flash, current_app
 from flask_login import login_required, current_user
 from . import bp
 from .services import take_rank_snapshot
@@ -17,6 +17,7 @@ logger = logging.getLogger(__name__)
 
 @bp.route('/')
 def index():
+    page = request.args.get('page', 1, type=int)
     gender = request.args.get('gender', None)
 
     # base query
@@ -37,7 +38,17 @@ def index():
     else:
         rank_type = 'all'
 
-    players = db.session.scalars(users_query).unique().all()
+    # Get paginated results
+    pagination = db.paginate(
+        users_query,
+        page=page,
+        per_page=current_app.config['USERS_PER_PAGE'],
+        error_out=False
+    )
+    players = pagination.items
+
+    # Calculate rank offset for pagination
+    rank_offset = (page - 1) * current_app.config['USERS_PER_PAGE']
 
     # Fetch all previous day's ranks in a single query
     current_date = datetime.now(timezone.utc).date()
@@ -50,13 +61,11 @@ def index():
         sa.func.date(UserRankHistory.created_at) == yesterday
     )
     previous_ranks = db.session.scalars(previous_ranks_query).all()
-
-    # Create a dictionary for quick lookup
     previous_ranks_dict = {rank.user_id: rank.rank for rank in previous_ranks}
 
     # Assign current rank and calculate rank change
     ranked_players = []
-    for idx, user in enumerate(players, start=1):
+    for idx, user in enumerate(players, rank_offset + 1):
         previous_rank = previous_ranks_dict.get(user.id)
         rank_change = None
         if previous_rank is not None:
@@ -68,7 +77,8 @@ def index():
             'user': user
         })
 
-    return render_template('rating/index.html', title='Рейтинг игроков', gender=gender, players=ranked_players)
+    return render_template('rating/index.html', title='Рейтинг игроков',
+                           gender=gender, players=ranked_players, pagination=pagination)
 
 
 @bp.route('/update-rankings')

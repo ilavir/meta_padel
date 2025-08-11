@@ -41,7 +41,7 @@
     </div>
     <div class="row">
         <div class="col">
-            <nav aria-label="Page navigation example">
+            <nav aria-label="Page navigation">
             <ul class="pagination justify-content-center">
                 <li class="page-item {{ 'disabled' if not pagination.has_prev }}">
                 <a class="page-link" href="{{ url_for('users.get_users', page=pagination.prev_num, **filters) }}">Назад</a>

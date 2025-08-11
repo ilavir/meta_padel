@@ -7,6 +7,24 @@
             <h1 class="text-center">{{ title }}</h1>
         </div>
     </div>
+    <!-- pagination -->
+    {% if pagination.has_prev or pagination.has_next %}
+    <div class="row">
+        <div class="col">
+            <nav aria-label="Page navigation">
+            <ul class="pagination justify-content-center">
+                <li class="page-item {{ 'disabled' if not pagination.has_prev }}">
+                <a class="page-link" href="{{ url_for('rating.index', page=pagination.prev_num, gender=gender) }}">Назад</a>
+                </li>
+                <li class="page-item {{ 'disabled' if not pagination.has_next }}">
+                <a class="page-link" href="{{ url_for('rating.index', page=pagination.next_num, gender=gender) }}">Вперед</a>
+                </li>
+            </ul>
+            </nav>
+        </div>
+    </div>
+    {% endif %}
+    <!-- /pagination -->
     <div class="row">
         <div class="col">
             <ul class="nav nav-tabs">
