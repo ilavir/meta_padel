@@ -34,7 +34,12 @@
     <!-- /filters -->
     <!-- pagination -->
     {% if pagination.has_prev or pagination.has_next %}
-    <div class="row mt-3">
+    <div class="row">
+        <div class="col mt-3 mb-2 text-center">
+            {{ pagination.first }} - {{ pagination.last }} из {{ pagination.total }} пользователей
+        </div>
+    </div>
+    <div class="row">
         <div class="col">
             <nav aria-label="Page navigation example">
             <ul class="pagination justify-content-center">
