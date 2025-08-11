@@ -104,7 +104,7 @@ def profile(username):
         return redirect(url_for('rating.index'))
 
     scores = user.scores
-    scores = sorted(scores, key=lambda score: score.created_at, reverse=True)[:10]
+    scores = sorted(scores, key=lambda score: score.created_at, reverse=True)[:5]
 
     score_templates = db.session.scalars(
             sa.select(ScoreTemplate)
@@ -120,15 +120,17 @@ def profile(username):
 @bp.route('/me')
 @login_required
 def my_profile():
-    scores = current_user.scores
-    scores = sorted(scores, key=lambda score: score.created_at, reverse=True)[:20]
+    # scores = current_user.scores
+    # scores = sorted(scores, key=lambda score: score.created_at, reverse=True)[:20]
 
-    score_templates = db.session.scalars(sa.select(ScoreTemplate)).all()
-    apply_score_form = ApplyScoreTemplateForm()
+    # score_templates = db.session.scalars(sa.select(ScoreTemplate)).all()
+    # apply_score_form = ApplyScoreTemplateForm()
 
-    return render_template('user/profile.html', title='Профиль',
-                           user=current_user, scores=scores,
-                           score_templates=score_templates, apply_score_form=apply_score_form)
+    # return render_template('user/profile.html', title='Профиль',
+    #                        user=current_user, scores=scores,
+    #                        score_templates=score_templates, apply_score_form=apply_score_form)
+
+    return redirect(url_for('user.profile', username=current_user.username))
 
 
 @bp.route('/id/<int:user_id>')
