@@ -23,7 +23,7 @@ class Config:
             'large': (300, 300)
         }
 
-    USERS_PER_PAGE = 30
+    USERS_PER_PAGE = int(os.environ.get('USERS_PER_PAGE', 100))
 
     SENTRY_FLASK_DSN = os.environ.get('SENTRY_FLASK_DSN')
 
