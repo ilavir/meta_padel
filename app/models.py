@@ -3,6 +3,7 @@ import logging
 from datetime import datetime, timezone
 from typing import Optional, Iterable
 import sqlalchemy as sa
+from sqlalchemy.ext.hybrid import hybrid_property
 import sqlalchemy.orm as so
 from app import db, login
 from flask import url_for, current_app
@@ -43,9 +44,20 @@ class User(UserMixin, BaseModel):
                                                        back_populates='user', passive_deletes=True)
     rank_history: so.Mapped[list['UserRankHistory']] = so.relationship(back_populates='user', passive_deletes=True)
 
-    @property
+    @hybrid_property
     def total_score(self):
+        # Python side: sum from loaded relationship
         return sum(score.score for score in self.scores)
+
+    @total_score.expression
+    def total_score(cls):
+        # SQL side: sum from the scores table
+        return (
+            sa.select(sa.func.coalesce(sa.func.sum(Score.score), 0))
+            .where(Score.user_id == cls.id)
+            .correlate(cls)
+            .scalar_subquery()
+        )
 
     def __repr__(self):
         return f'<User {self.username}>'

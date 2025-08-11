@@ -8,7 +8,7 @@ from .forms import ApplyScoreTemplateForm
 import sqlalchemy as sa
 from sqlalchemy.orm import joinedload
 from app import db
-from app.models import User, UserRankHistory, Score, ScoreTemplate
+from app.models import User, UserRankHistory, Score, ScoreTemplate, Role
 from app.services import role_required
 
 
@@ -19,23 +19,25 @@ logger = logging.getLogger(__name__)
 def index():
     gender = request.args.get('gender', None)
 
-    # make users list for rating: 'male', 'female' or 'all'
+    # base query
+    users_query = (
+        sa.select(User)
+        .join(User.roles)
+        .where(User.active, Role.name == 'player')
+        .options(
+            joinedload(User.roles),
+            joinedload(User.scores)
+        )
+        .order_by(User.total_score.desc())
+    )
+
     if gender in ['male', 'female']:
         rank_type = gender
-        users_query = sa.select(User).where(User.active, User.gender == gender).options(
-                joinedload(User.roles),
-                joinedload(User.scores)
-            )
+        users_query = users_query.where(User.gender == gender)
     else:
         rank_type = 'all'
-        users_query = sa.select(User).where(User.active).options(
-                joinedload(User.roles),
-                joinedload(User.scores)
-            )
 
-    users = db.session.scalars(users_query).unique().all()
-    players = [user for user in users if user.has_role('player')]
-    players = sorted(players, key=lambda user: user.total_score, reverse=True)
+    players = db.session.scalars(users_query).unique().all()
 
     # Fetch all previous day's ranks in a single query
     current_date = datetime.now(timezone.utc).date()
