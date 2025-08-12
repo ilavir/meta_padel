@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% from '_pagination_macro.html' import render_pagination %}
 
 {% block content %}
 
@@ -39,20 +40,7 @@
             {{ pagination.first }} - {{ pagination.last }} из {{ pagination.total }} пользователей
         </div>
     </div>
-    <div class="row">
-        <div class="col">
-            <nav aria-label="Page navigation">
-            <ul class="pagination justify-content-center">
-                <li class="page-item {{ 'disabled' if not pagination.has_prev }}">
-                <a class="page-link" href="{{ url_for('users.get_users', page=pagination.prev_num, **filters) }}">Назад</a>
-                </li>
-                <li class="page-item {{ 'disabled' if not pagination.has_next }}">
-                <a class="page-link" href="{{ url_for('users.get_users', page=pagination.next_num, **filters) }}">Вперед</a>
-                </li>
-            </ul>
-            </nav>
-        </div>
-    </div>
+    {{ render_pagination(pagination, 'users.get_users', filters=filters) }}
     {% endif %}
     <!-- /pagination -->
     <div class="row">

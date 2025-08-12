@@ -27,6 +27,11 @@
     border-color: #9158a6;
 }
 
+.pagination {
+    --bs-pagination-active-bg: #9158a6;
+    --bs-pagination-active-border-color: #9158a6;
+}
+
 .btn-purple {
     --bs-btn-color: #fff;
     --bs-btn-bg: #9158a6;
