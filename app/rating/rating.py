@@ -29,7 +29,7 @@ def index():
             joinedload(User.roles),
             joinedload(User.scores)
         )
-        .order_by(User.total_score.desc())
+        .order_by(User.total_score.desc(), User.created_at.asc())
     )
 
     if gender in ['male', 'female']:
