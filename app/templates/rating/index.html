@@ -15,7 +15,10 @@
         <div class="col">
             <ul class="nav nav-tabs">
                 <li class="nav-item">
-                    <a class="nav-link {{ 'active' if not gender }}" {{ 'aria-current=page' if not gender }} href="{{ url_for('rating.index') }}">Общий</a>
+                    <a class="nav-link {{ 'active' if season == 'autumn_2025' }}" {{ 'aria-current=page' if season == 'autumn_2025' }} href="{{ url_for('rating.index', season='autumn_2025') }}">Осенний сезон</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link {{ 'active' if not gender and not season }}" {{ 'aria-current=page' if not gender }} href="{{ url_for('rating.index') }}">Общий</a>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link {{ 'active' if gender == 'male' }}" {{ 'aria-current=page' if gender == 'male' }} href="{{ url_for('rating.index', gender='male') }}">Мужской</a>
@@ -70,7 +73,7 @@
                                 <a href="{{ url_for('user.profile', username=player.user.username) }}">{{ player.user.name }}</a>
                             {% endif %}
                         </td>
-                        <td class="text-end">{{ player.user.total_score }}</td>
+                        <td class="text-end">{{ player.user.display_score }}</td>
                     </tr>
                     {% endfor %}
                 </tbody>

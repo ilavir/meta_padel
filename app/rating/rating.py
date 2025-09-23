@@ -19,6 +19,11 @@ logger = logging.getLogger(__name__)
 def index():
     page = request.args.get('page', 1, type=int)
     gender = request.args.get('gender', None)
+    season = request.args.get('season', None)
+
+    # Define autumn season dates
+    autumn_2025_start = datetime(2025, 9, 1)
+    autumn_2025_end = datetime(2025, 11, 30, 23, 59, 59)
 
     # base query
     users_query = (
@@ -35,6 +40,10 @@ def index():
     if gender in ['male', 'female']:
         rank_type = gender
         users_query = users_query.where(User.gender == gender)
+    if season == 'autumn_2025':
+        rank_type = 'autumn_2025'
+        users_query = users_query.join(Score, Score.user_id == User.id) \
+            .where(Score.created_at.between(autumn_2025_start, autumn_2025_end)).distinct()
     else:
         rank_type = 'all'
 
@@ -46,6 +55,21 @@ def index():
         error_out=False
     )
     players = pagination.items
+
+    # Calculate season-specific scores and sort if needed
+    if season == 'autumn_2025':
+        # Calculate autumn scores for each player
+        for user in players:
+            autumn_score = sum(s.score for s in user.scores
+                               if autumn_2025_start <= s.created_at <= autumn_2025_end)
+            user.display_score = autumn_score
+
+        # Sort by autumn scores (highest first)
+        players.sort(key=lambda u: u.display_score, reverse=True)
+    else:
+        # Use total scores for other views
+        for user in players:
+            user.display_score = user.total_score
 
     # Calculate rank offset for pagination
     rank_offset = (page - 1) * current_app.config['USERS_PER_PAGE']
@@ -78,7 +102,7 @@ def index():
         })
 
     return render_template('rating/index.html', title='Рейтинг игроков',
-                           gender=gender, players=ranked_players, pagination=pagination)
+                           gender=gender, season=season, players=ranked_players, pagination=pagination)
 
 
 @bp.route('/update-rankings')
