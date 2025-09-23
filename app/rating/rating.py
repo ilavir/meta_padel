@@ -40,8 +40,8 @@ def index():
     if gender in ['male', 'female']:
         rank_type = gender
         users_query = users_query.where(User.gender == gender)
-    if season == 'autumn_2025':
-        rank_type = 'autumn_2025'
+    elif season in ['autumn_2025']:
+        rank_type = season
         users_query = users_query.join(Score, Score.user_id == User.id) \
             .where(Score.created_at.between(autumn_2025_start, autumn_2025_end)).distinct()
     else:
