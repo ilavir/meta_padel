@@ -41,7 +41,7 @@
     <!-- Navigation Bar -->
     <nav class="navbar navbar-expand-lg mb-4">
             <div class="container">
-                <a class="navbar-brand" href="{{ url_for('rating.index') }}">
+                <a class="navbar-brand" href="{{ url_for('rating.index', season=config['DEFAULT_SEASON']) }}">
                 <img src="{{ url_for('static', filename='img/logo.svg') }}" alt="Meta Padel" width="80" height="40">
                 <!-- <img src="{{ url_for('static', filename='img/logo.png') }}" alt="Meta Padel" width="75" height="40"> -->
                 </a>
@@ -50,7 +50,7 @@
             </button>
             <div class="collapse navbar-collapse" id="navbarSupportedContent">
                 <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-                    <li class="nav-item"><a href="{{ url_for('rating.index') }}" class="nav-link {{ 'active' if request.endpoint == 'rating.index' }}" {{ 'aria-current=page' if request.endpoint == 'rating.index' }}>Рейтинг</a></li>
+                    <li class="nav-item"><a href="{{ url_for('rating.index', season=config['DEFAULT_SEASON']) }}" class="nav-link {{ 'active' if request.endpoint == 'rating.index' }}" {{ 'aria-current=page' if request.endpoint == 'rating.index' }}>Рейтинг</a></li>
                     <li class="nav-item"><a href="{{ url_for('rating.faq_page') }}" class="nav-link {{ 'active' if request.endpoint == 'rating.faq_page' }}" {{ 'aria-current=page' if request.endpoint == 'rating.faq_page' }}>FAQ</a></li>
                     <li class="nav-item"><a href="https://n1391940.yclients.com/" class="nav-link" target="_blank">Записаться</a></li>
                     {% if not current_user.is_anonymous and current_user.has_any_role(['admin', 'superadmin']) %}

@@ -110,19 +110,25 @@ def index():
 @role_required(['superadmin', 'admin'])
 def update_rankings():
     rank_type = request.args.get('rank_type', None)
-    if rank_type and rank_type not in ['male', 'female', 'all']:
+    valid_types = ['male', 'female', 'all', 'autumn_2025']
+
+    if rank_type and rank_type not in valid_types:
         logger.error(f'Invalid Rank Type: {rank_type}')
         flash('Неверный тип рейтинга', 'error')
     elif rank_type:
         take_rank_snapshot(rank_type)
         logger.info(f'Rankings updated for {rank_type} players')
         flash('Рейтинг обновлен', 'success')
-        return redirect(url_for('rating.index', gender=rank_type))
 
-    elif not rank_type:
-        take_rank_snapshot('all')
-        take_rank_snapshot('male')
-        take_rank_snapshot('female')
+        # Redirect to appropriate tab
+        if rank_type == 'autumn_2025':
+            return redirect(url_for('rating.index', season='autumn_2025'))
+        elif rank_type in ['male', 'female']:
+            return redirect(url_for('rating.index', gender=rank_type))
+    else:
+        # Update all rankings
+        for rt in ['all', 'male', 'female', 'autumn_2025']:
+            take_rank_snapshot(rt)
         logger.info('Rankings updated for all players')
         flash('Рейтинг обновлен', 'success')
 

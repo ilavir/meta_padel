@@ -12,6 +12,8 @@ class Config:
     SECRET_KEY = os.environ.get('SECRET_KEY')
     SESSION_COOKIE_NAME = os.environ.get('SESSION_COOKIE_NAME')
 
+    DEFAULT_SEASON = os.environ.get('DEFAULT_SEASON')
+
     UPLOAD_FOLDER = os.path.join(BASEDIR, 'app', 'static', 'uploads')
     AVATARS_FOLDER = os.path.join(UPLOAD_FOLDER, 'avatars')
     AVATARS_ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg'}
