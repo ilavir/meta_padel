@@ -24,7 +24,7 @@ def take_rank_snapshot(rank_type: str):
 
     # Sort by appropriate score
     if rank_type == 'autumn_2025':
-        autumn_2025_start = datetime(2025, 9, 1)
+        autumn_2025_start = datetime(2025, 9, 22)
         autumn_2025_end = datetime(2025, 11, 30, 23, 59, 59)
 
         def get_score(u):
