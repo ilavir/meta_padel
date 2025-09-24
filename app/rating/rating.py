@@ -21,88 +21,64 @@ def index():
     gender = request.args.get('gender', None)
     season = request.args.get('season', None)
 
-    # Define autumn season dates
+    if not gender and not season:
+        season = current_app.config['DEFAULT_SEASON']
+
     autumn_2025_start = datetime(2025, 9, 22)
     autumn_2025_end = datetime(2025, 11, 30, 23, 59, 59)
+    is_autumn_season = season == 'autumn_2025'
+    is_gender_filter = gender in ['male', 'female']
 
-    # base query
+    # Determine rank type
+    rank_type = gender if is_gender_filter else season if is_autumn_season else 'all'
+
+    # Build query
     users_query = (
         sa.select(User)
         .join(User.roles)
         .where(User.active, Role.name == 'player')
-        .options(
-            joinedload(User.roles),
-            joinedload(User.scores)
-        )
+        .options(joinedload(User.roles), joinedload(User.scores))
         .order_by(User.total_score.desc(), User.created_at.asc())
     )
 
-    if gender in ['male', 'female']:
-        rank_type = gender
+    if is_gender_filter:
         users_query = users_query.where(User.gender == gender)
-    elif season in ['autumn_2025']:
-        rank_type = season
+    elif is_autumn_season:
         users_query = users_query.join(Score, Score.user_id == User.id) \
             .where(Score.created_at.between(autumn_2025_start, autumn_2025_end)).distinct()
-    else:
-        rank_type = 'all'
 
-    # Get paginated results
-    pagination = db.paginate(
-        users_query,
-        page=page,
-        per_page=current_app.config['USERS_PER_PAGE'],
-        error_out=False
-    )
+    pagination = db.paginate(users_query, page=page, per_page=current_app.config['USERS_PER_PAGE'], error_out=False)
     players = pagination.items
 
-    # Calculate season-specific scores and sort if needed
-    if season == 'autumn_2025':
-        # Calculate autumn scores for each player
+    # Set display scores and sort if needed
+    if is_autumn_season:
         for user in players:
-            autumn_score = sum(s.score for s in user.scores
-                               if autumn_2025_start <= s.created_at <= autumn_2025_end)
-            user.display_score = autumn_score
-
-        # Sort by autumn scores (highest first)
+            user.display_score = sum(s.score for s in user.scores
+                                   if autumn_2025_start <= s.created_at <= autumn_2025_end)
         players.sort(key=lambda u: u.display_score, reverse=True)
     else:
-        # Use total scores for other views
         for user in players:
             user.display_score = user.total_score
 
-    # Calculate rank offset for pagination
-    rank_offset = (page - 1) * current_app.config['USERS_PER_PAGE']
-
-    # Fetch all previous day's ranks in a single query
-    current_date = datetime.now(timezone.utc).date()
-    yesterday = current_date - timedelta(days=1)
-
-    # Get all previous ranks in one query
+    # Get previous ranks
+    yesterday = (datetime.now(timezone.utc) - timedelta(days=1)).date()
     previous_ranks_query = sa.select(UserRankHistory).where(
-        UserRankHistory.user_id.in_([player.id for player in players]),
+        UserRankHistory.user_id.in_([p.id for p in players]),
         UserRankHistory.rank_type == rank_type,
         sa.func.date(UserRankHistory.created_at) == yesterday
     )
-    previous_ranks = db.session.scalars(previous_ranks_query).all()
-    previous_ranks_dict = {rank.user_id: rank.rank for rank in previous_ranks}
+    previous_ranks_dict = {r.user_id: r.rank for r in db.session.scalars(previous_ranks_query)}
 
-    # Assign current rank and calculate rank change
-    ranked_players = []
-    for idx, user in enumerate(players, rank_offset + 1):
-        previous_rank = previous_ranks_dict.get(user.id)
-        rank_change = None
-        if previous_rank is not None:
-            rank_change = previous_rank - idx  # Positive if moved up, negative if moved down
-
-        ranked_players.append({
-            'rank': idx,
-            'rank_change': rank_change,
-            'user': user
-        })
+    # Build ranked players list
+    rank_offset = (page - 1) * current_app.config['USERS_PER_PAGE']
+    ranked_players = [{
+        'rank': idx,
+        'rank_change': previous_ranks_dict.get(user.id, 0) - idx if user.id in previous_ranks_dict else None,
+        'user': user
+    } for idx, user in enumerate(players, rank_offset + 1)]
 
     return render_template('rating/index.html', title='Рейтинг игроков',
-                           gender=gender, season=season, players=ranked_players, pagination=pagination)
+                         gender=gender, season=season, players=ranked_players, pagination=pagination)
 
 
 @bp.route('/update-rankings')

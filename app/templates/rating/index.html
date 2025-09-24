@@ -9,16 +9,16 @@
         </div>
     </div>
     <!-- pagination -->
-    {{ render_pagination(pagination, 'rating.index', gender=gender) }}
+    {{ render_pagination(pagination, 'rating.index', gender=gender, season=season) }}
     <!-- /pagination -->
     <div class="row">
         <div class="col">
             <ul class="nav nav-tabs">
-                <li class="nav-item">
+                <!-- <li class="nav-item">
                     <a class="nav-link {{ 'active' if season == 'autumn_2025' }}" {{ 'aria-current=page' if season == 'autumn_2025' }} href="{{ url_for('rating.index', season='autumn_2025') }}">Осенний сезон</a>
-                </li>
+                </li> -->
                 <li class="nav-item">
-                    <a class="nav-link {{ 'active' if not gender and not season }}" {{ 'aria-current=page' if not gender }} href="{{ url_for('rating.index') }}">Общий</a>
+                    <a class="nav-link {{ 'active' if not gender }}" {{ 'aria-current=page' if not gender }} href="{{ url_for('rating.index') }}">Общий</a>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link {{ 'active' if gender == 'male' }}" {{ 'aria-current=page' if gender == 'male' }} href="{{ url_for('rating.index', gender='male') }}">Мужской</a>
@@ -29,6 +29,16 @@
             </ul>
         </div>
     </div>
+    {% if season %}
+    <div class="row my-2">
+        <div class="col-12 col-md-4 ms-md-auto">
+            <select class="form-select" id="seasonSelect" aria-label="Season select">
+                <option value="autumn_2025" {{ 'selected' if season == "autumn_2025" }}>Осенний сезон</option>
+                <option value="all" {{ 'selected' if season == "all" }}>За все время</option>
+            </select>
+        </div>
+    </div>
+    {% endif %}
     <div class="row">
         <div class="col">
 
@@ -83,4 +93,11 @@
         </div>
     </div>
 </div>
+
+<script>
+document.getElementById('seasonSelect').addEventListener('change', function() {
+    const selectedValue = this.value;
+    window.location.href = "{{ url_for('rating.index') }}?season=" + selectedValue;
+});
+</script>
 {% endblock %}

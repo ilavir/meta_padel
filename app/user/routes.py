@@ -49,7 +49,7 @@ def login():
 
         next_page = request.args.get('next')
         if not next_page or urlsplit(next_page).netloc != '':
-            next_page = url_for('rating.index', season=current_app.config['DEFAULT_SEASON'])
+            next_page = url_for('rating.index')
 
         return redirect(next_page)
 
