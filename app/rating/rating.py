@@ -6,10 +6,10 @@ from . import bp
 from .services import take_rank_snapshot
 from .forms import ApplyScoreTemplateForm
 import sqlalchemy as sa
-from sqlalchemy.orm import joinedload
 from app import db
-from app.models import User, UserRankHistory, Score, ScoreTemplate, Role
+from app.models import User, UserRankHistory, Score, ScoreTemplate
 from app.services import role_required
+from app.rating.services import get_players
 
 
 logger = logging.getLogger(__name__)
@@ -21,49 +21,55 @@ def index():
     gender = request.args.get('gender', None)
     season = request.args.get('season', None)
 
+    # set default season if not season and not gender
     if not gender and not season:
         season = current_app.config['DEFAULT_SEASON']
 
-    autumn_2025_start = datetime(2025, 9, 22)
-    autumn_2025_end = datetime(2025, 11, 30, 23, 59, 59)
-    is_autumn_season = season == 'autumn_2025'
+    is_season_filter = season in ['autumn_2025']
     is_gender_filter = gender in ['male', 'female']
 
     # Determine rank type
-    rank_type = gender if is_gender_filter else season if is_autumn_season else 'all'
+    rank_type = gender if is_gender_filter else season if is_season_filter else 'all'
 
-    # Build query
-    users_query = (
-        sa.select(User)
-        .join(User.roles)
-        .where(User.active, Role.name == 'player')
-        .options(joinedload(User.roles), joinedload(User.scores))
-        .order_by(User.total_score.desc(), User.created_at.asc())
-    )
+    # Get filtered and sorted players
+    players = get_players(rank_type)
 
-    if is_gender_filter:
-        users_query = users_query.where(User.gender == gender)
-    elif is_autumn_season:
-        users_query = users_query.join(Score, Score.user_id == User.id) \
-            .where(Score.created_at.between(autumn_2025_start, autumn_2025_end)).distinct()
+    # Apply pagination to sorted results
+    total = len(players)
+    per_page = current_app.config['USERS_PER_PAGE']
+    start = (page - 1) * per_page
+    end = start + per_page
+    paginated_players = players[start:end]
 
-    pagination = db.paginate(users_query, page=page, per_page=current_app.config['USERS_PER_PAGE'], error_out=False)
-    players = pagination.items
+    # Create pagination object manually
+    class SimplePagination:
+        def __init__(self, page, per_page, total, items):
+            self.page = page
+            self.per_page = per_page
+            self.total = total
+            self.items = items
+            self.pages = (total + per_page - 1) // per_page
+            self.has_prev = page > 1
+            self.has_next = page < self.pages
+            self.prev_num = page - 1 if self.has_prev else None
+            self.next_num = page + 1 if self.has_next else None
 
-    # Set display scores and sort if needed
-    if is_autumn_season:
-        for user in players:
-            user.display_score = sum(s.score for s in user.scores
-                                   if autumn_2025_start <= s.created_at <= autumn_2025_end)
-        players.sort(key=lambda u: u.display_score, reverse=True)
-    else:
-        for user in players:
-            user.display_score = user.total_score
+        def iter_pages(self, left_edge=2, left_current=2, right_current=3, right_edge=2):
+            last = self.pages
+            for num in range(1, last + 1):
+                if num <= left_edge or \
+                   (self.page - left_current - 1 < num < self.page + right_current) or \
+                   num > last - right_edge:
+                    yield num
+                elif num == left_edge + 1 or num == last - right_edge:
+                    yield None
+
+    pagination = SimplePagination(page, per_page, total, paginated_players)
 
     # Get previous ranks
     yesterday = (datetime.now(timezone.utc) - timedelta(days=1)).date()
     previous_ranks_query = sa.select(UserRankHistory).where(
-        UserRankHistory.user_id.in_([p.id for p in players]),
+        UserRankHistory.user_id.in_([p.id for p in paginated_players]),
         UserRankHistory.rank_type == rank_type,
         sa.func.date(UserRankHistory.created_at) == yesterday
     )
@@ -75,10 +81,10 @@ def index():
         'rank': idx,
         'rank_change': previous_ranks_dict.get(user.id, 0) - idx if user.id in previous_ranks_dict else None,
         'user': user
-    } for idx, user in enumerate(players, rank_offset + 1)]
+    } for idx, user in enumerate(paginated_players, rank_offset + 1)]
 
     return render_template('rating/index.html', title='Рейтинг игроков',
-                         gender=gender, season=season, players=ranked_players, pagination=pagination)
+                           gender=gender, season=season, players=ranked_players, pagination=pagination)
 
 
 @bp.route('/update-rankings')

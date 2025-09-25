@@ -1,11 +1,87 @@
 import logging
 from datetime import datetime
 import sqlalchemy as sa
+from sqlalchemy.orm import joinedload
 from app import db
-from app.models import User, UserRankHistory
+from app.models import User, UserRankHistory, Role, Score
 
 
 logger = logging.getLogger(__name__)
+
+
+def get_season_dates(season: str):
+    """
+    Returns start and end dates for a given season.
+    :param season: 'autumn_2025'
+    :return: (start_date, end_date)
+    """
+
+    if season == 'autumn_2025':
+        return datetime(2025, 9, 22), datetime(2025, 11, 30, 23, 59, 59)
+    else:
+        raise ValueError(f'Invalid season: {season}')
+
+
+def get_users_query(rank_type: str):
+    """
+    Returns a query for users based on the rank_type.
+    :param rank_type: 'all', 'male', 'female', or 'autumn_2025'
+    :return: SQLAlchemy query
+    """
+
+    # Get active players
+    users_query = (
+        sa.select(User)
+        .join(User.roles)
+        .where(User.active, Role.name == 'player')
+        .options(joinedload(User.roles), joinedload(User.scores))
+    )
+
+    if rank_type in ['male', 'female']:
+        users_query = users_query.where(User.gender == rank_type)
+    elif rank_type == 'autumn_2025':
+        season_start, season_end = get_season_dates(rank_type)
+        users_query = users_query.join(Score, Score.user_id == User.id) \
+            .where(Score.created_at.between(season_start, season_end)).distinct()
+
+    return users_query.order_by(User.total_score.desc(), User.created_at.asc())
+
+
+def get_sorted_players(users, rank_type: str):
+    """
+    Returns a list of players sorted by their total score.
+    :param rank_type: 'all', 'male', 'female', or 'autumn_2025'
+    :return: List of User objects
+    """
+
+    if rank_type in ['autumn_2025']:
+        season_start, season_end = get_season_dates(rank_type)
+
+        for user in users:
+            user.display_score = sum(
+                s.score for s in user.scores
+                if season_start <= s.created_at <= season_end
+            )
+        users = [u for u in users if u.display_score > 0]
+        users.sort(key=lambda u: (u.display_score, -u.created_at.timestamp()), reverse=True)
+    else:
+        for user in users:
+            user.display_score = user.total_score
+
+    return users
+
+
+def get_players(rank_type: str):
+    """
+    Returns a list of players sorted by their total score.
+    :param rank_type: 'all', 'male', 'female', or 'autumn_2025'
+    :return: List of User objects
+    """
+
+    users_query = get_users_query(rank_type)
+    users = db.session.scalars(users_query).unique().all()
+
+    return get_sorted_players(users, rank_type)
 
 
 def take_rank_snapshot(rank_type: str):
@@ -14,31 +90,12 @@ def take_rank_snapshot(rank_type: str):
     :param rank_type: 'all', 'male', 'female', or 'autumn_2025'
     """
 
-    # Get active players
-    users_query = sa.select(User).where(User.active)
-    if rank_type in ['male', 'female']:
-        users_query = users_query.where(User.gender == rank_type)
+    if rank_type not in ['all', 'male', 'female', 'autumn_2025']:
+        logger.error(f'Invalid rank type: {rank_type}')
+        return {'success': False, 'message': f'Invalid rank type: {rank_type}'}
 
-    users = db.session.scalars(users_query).all()
-    players = [user for user in users if user.has_role('player')]
-
-    # Sort by appropriate score
-    if rank_type == 'autumn_2025':
-        autumn_2025_start = datetime(2025, 9, 22)
-        autumn_2025_end = datetime(2025, 11, 30, 23, 59, 59)
-
-        def get_score(u):
-            return sum(
-                s.score for s in u.scores
-                if autumn_2025_start <= s.created_at <= autumn_2025_end
-            )
-
-        players = [p for p in players if get_score(p) > 0]
-    else:
-        def get_score(u):
-            return u.total_score
-
-    players.sort(key=get_score, reverse=True)
+    # Get filtered and sorted players
+    players = get_players(rank_type)
 
     for idx, player in enumerate(players, start=1):
         # Create a new snapshot
