@@ -131,6 +131,7 @@ def apply_score_template():
         user_id = request.form.get('user_id')
 
         if not template_id or not user_id:
+            logger.warning('Error applying score template: missing data')
             flash('Ошибка: отсутствуют данные', 'error')
             return redirect(request.referrer or url_for('rating.index'))
 
@@ -138,6 +139,7 @@ def apply_score_template():
         user = db.session.get(User, user_id)
 
         if not template or not user:
+            logger.warning('Error applying score template: template or user not found')
             flash('Ошибка: шаблон или пользователь не найден', 'error')
             return redirect(request.referrer or url_for('rating.index'))
 
@@ -159,6 +161,10 @@ def apply_score_template():
         # take_rank_snapshot('all')
         # if user.gender:
         #     take_rank_snapshot(user.gender)
+    else:
+        logger.warning(f'Error applying score template: {apply_score_form.errors}')
+        flash('Ошибка при применении шаблона', 'error')
+        return redirect(request.referrer or url_for('rating.index'))
 
     return redirect(url_for('user.profile', username=user.username))
 
