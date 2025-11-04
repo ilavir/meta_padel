@@ -161,12 +161,12 @@ def apply_score_template():
         # take_rank_snapshot('all')
         # if user.gender:
         #     take_rank_snapshot(user.gender)
-    else:
-        logger.warning(f'Error applying score template: {apply_score_form.errors}')
-        flash('Ошибка при применении шаблона', 'error')
-        return redirect(request.referrer or url_for('rating.index'))
 
-    return redirect(url_for('user.profile', username=user.username))
+        return redirect(url_for('user.profile', username=user.username))
+
+    logger.warning(f'Error applying score template: {apply_score_form.errors}')
+    flash('Ошибка при применении шаблона', 'error')
+    return redirect(request.referrer or url_for('rating.index'))
 
 
 @bp.route('/delete-score/<int:score_id>')
