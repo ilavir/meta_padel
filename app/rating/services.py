@@ -17,7 +17,7 @@ def get_season_dates(season: str):
     """
 
     if season == 'autumn_2025':
-        return datetime(2025, 9, 22), datetime(2025, 11, 30, 23, 59, 59)
+        return datetime(2025, 9, 22), datetime(2025, 12, 26, 23, 59, 59)
     else:
         raise ValueError(f'Invalid season: {season}')
 
