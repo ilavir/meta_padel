@@ -17,11 +17,11 @@ def update_rankings_job():
         app = create_app()
 
         with app.app_context():
-            # Update rankings for all gender types
+            # Update rankings for all gender types and current season
             take_rank_snapshot('all')
             take_rank_snapshot('male')
             take_rank_snapshot('female')
-            take_rank_snapshot('autumn_2025')
+            take_rank_snapshot('winter_2025')
 
             logger.info("Rankings updated successfully via scheduler for all player types")
 

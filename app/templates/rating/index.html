@@ -33,6 +33,7 @@
     <div class="row my-2">
         <div class="col-12 col-md-4 ms-md-auto">
             <select class="form-select" id="seasonSelect" aria-label="Season select">
+                <option value="winter_2025" {{ 'selected' if season == "winter_2025" }}>Зимний сезон</option>
                 <option value="autumn_2025" {{ 'selected' if season == "autumn_2025" }}>Осенний сезон</option>
                 <option value="all" {{ 'selected' if season == "all" }}>За все время</option>
             </select>
