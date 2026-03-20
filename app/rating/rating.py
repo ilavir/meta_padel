@@ -25,7 +25,7 @@ def index():
     if not gender and not season:
         season = current_app.config['DEFAULT_SEASON']
 
-    is_season_filter = season in ['autumn_2025', 'winter_2025']
+    is_season_filter = season in ['autumn_2025', 'winter_2025', 'spring_2026']
     is_gender_filter = gender in ['male', 'female']
 
     # Determine rank type
@@ -92,7 +92,7 @@ def index():
 @role_required(['superadmin', 'admin'])
 def update_rankings():
     rank_type = request.args.get('rank_type', None)
-    valid_types = ['male', 'female', 'all', 'autumn_2025', 'winter_2025']
+    valid_types = ['male', 'female', 'all', 'autumn_2025', 'winter_2025', 'spring_2026']
 
     if rank_type and rank_type not in valid_types:
         logger.error(f'Invalid Rank Type: {rank_type}')
@@ -107,11 +107,13 @@ def update_rankings():
             return redirect(url_for('rating.index', season='autumn_2025'))
         elif rank_type == 'winter_2025':
             return redirect(url_for('rating.index', season='winter_2025'))
+        elif rank_type == 'spring_2026':
+            return redirect(url_for('rating.index', season='spring_2026'))
         elif rank_type in ['male', 'female']:
             return redirect(url_for('rating.index', gender=rank_type))
     else:
         # Update all rankings
-        for rt in ['all', 'male', 'female', 'autumn_2025', 'winter_2025']:
+        for rt in ['all', 'male', 'female', 'autumn_2025', 'winter_2025', 'spring_2026']:
             take_rank_snapshot(rt)
         logger.info('Rankings updated for all players')
         flash('Рейтинг обновлен', 'success')
