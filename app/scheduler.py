@@ -21,7 +21,7 @@ def update_rankings_job():
             take_rank_snapshot('all')
             take_rank_snapshot('male')
             take_rank_snapshot('female')
-            take_rank_snapshot('spring_2026')
+            take_rank_snapshot('summer_2026')
 
             logger.info("Rankings updated successfully via scheduler for all player types")
 

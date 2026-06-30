@@ -12,7 +12,7 @@ logger = logging.getLogger(__name__)
 def get_season_dates(season: str):
     """
     Returns start and end dates for a given season.
-    :param season: 'autumn_2025', 'winter_2025', 'spring_2026'
+    :param season: 'autumn_2025', 'winter_2025', 'spring_2026', 'summer_2026'
     :return: (start_date, end_date)
     """
 
@@ -22,6 +22,8 @@ def get_season_dates(season: str):
         return datetime(2025, 12, 27), datetime(2026, 3, 20, 23, 59, 59)
     elif season == 'spring_2026':
         return datetime(2026, 3, 21), datetime(2026, 6, 20, 23, 59, 59)
+    elif season == 'summer_2026':
+        return datetime(2026, 6, 21), datetime(2026, 9, 20, 23, 59, 59)
     else:
         raise ValueError(f'Invalid season: {season}')
 
@@ -29,7 +31,7 @@ def get_season_dates(season: str):
 def get_users_query(rank_type: str):
     """
     Returns a query for users based on the rank_type.
-    :param rank_type: 'all', 'male', 'female', 'autumn_2025', 'winter_2025', or 'spring_2026'
+    :param rank_type: 'all', 'male', 'female', 'autumn_2025', 'winter_2025', 'spring_2026', or 'summer_2026'
     :return: SQLAlchemy query
     """
 
@@ -43,7 +45,7 @@ def get_users_query(rank_type: str):
 
     if rank_type in ['male', 'female']:
         users_query = users_query.where(User.gender == rank_type)
-    elif rank_type in ['autumn_2025', 'winter_2025', 'spring_2026']:
+    elif rank_type in ['autumn_2025', 'winter_2025', 'spring_2026', 'summer_2026']:
         season_start, season_end = get_season_dates(rank_type)
         users_query = users_query.join(Score, Score.user_id == User.id) \
             .where(Score.created_at.between(season_start, season_end)).distinct()
@@ -54,11 +56,11 @@ def get_users_query(rank_type: str):
 def get_sorted_players(users, rank_type: str):
     """
     Returns a list of players sorted by their total score.
-    :param rank_type: 'all', 'male', 'female', 'autumn_2025', 'winter_2025', or 'spring_2026'
+    :param rank_type: 'all', 'male', 'female', 'autumn_2025', 'winter_2025', 'spring_2026', or 'summer_2026'
     :return: List of User objects
     """
 
-    if rank_type in ['autumn_2025', 'winter_2025', 'spring_2026']:
+    if rank_type in ['autumn_2025', 'winter_2025', 'spring_2026', 'summer_2026']:
         season_start, season_end = get_season_dates(rank_type)
 
         for user in users:
@@ -78,7 +80,7 @@ def get_sorted_players(users, rank_type: str):
 def get_players(rank_type: str):
     """
     Returns a list of players sorted by their total score.
-    :param rank_type: 'all', 'male', 'female', 'autumn_2025', 'winter_2025', or 'spring_2026'
+    :param rank_type: 'all', 'male', 'female', 'autumn_2025', 'winter_2025', 'spring_2026', or 'summer_2026'
     :return: List of User objects
     """
 
@@ -91,10 +93,10 @@ def get_players(rank_type: str):
 def take_rank_snapshot(rank_type: str):
     """
     Calculates current ranks for a given rank_type and saves them to RankHistory.
-    :param rank_type: 'all', 'male', 'female', 'autumn_2025', 'winter_2025', or 'spring_2026'
+    :param rank_type: 'all', 'male', 'female', 'autumn_2025', 'winter_2025', 'spring_2026', or 'summer_2026'
     """
 
-    if rank_type not in ['all', 'male', 'female', 'autumn_2025', 'winter_2025', 'spring_2026']:
+    if rank_type not in ['all', 'male', 'female', 'autumn_2025', 'winter_2025', 'spring_2026', 'summer_2026']:
         logger.error(f'Invalid rank type: {rank_type}')
         return {'success': False, 'message': f'Invalid rank type: {rank_type}'}
 
