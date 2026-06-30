@@ -21,9 +21,9 @@ def get_season_dates(season: str):
     elif season == 'winter_2025':
         return datetime(2025, 12, 27), datetime(2026, 3, 20, 23, 59, 59)
     elif season == 'spring_2026':
-        return datetime(2026, 3, 21), datetime(2026, 6, 20, 23, 59, 59)
+        return datetime(2026, 3, 21), datetime(2026, 6, 30, 23, 59, 59)
     elif season == 'summer_2026':
-        return datetime(2026, 6, 21), datetime(2026, 9, 20, 23, 59, 59)
+        return datetime(2026, 7, 1), datetime(2026, 9, 20, 23, 59, 59)
     else:
         raise ValueError(f'Invalid season: {season}')
 
