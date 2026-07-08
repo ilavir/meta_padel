@@ -9,12 +9,8 @@ This document describes the testing infrastructure set up for the Meta Padel Rat
 ```
 tests/
 ├── conftest.py           # Test configuration and fixtures
-├── test_basic.py         # Basic application tests
-├── test_models.py        # Database model tests
-├── test_user_routes.py   # User authentication tests
-├── test_rating_routes.py # Rating system tests
 ├── test_forms.py         # Form validation tests
-└── test_utils.py         # Utility function tests
+└── test_scheduler.py     # Scheduler job and lock-recovery tests
 ```
 
 ## Configuration
@@ -27,63 +23,84 @@ The testing configuration has been enhanced with:
 - Test-specific secret key
 - Sentry disabled for testing
 
-### Test Dependencies (requirements-test.txt)
+### Tooling and Test Dependencies
+Dependencies are managed with [`uv`](https://docs.astral.sh/uv/), with
+`pyproject.toml` as the single source of truth. Runtime dependencies live
+under `[project.dependencies]`; test-only dependencies live in the
+`test` dependency group (PEP 735) under `[dependency-groups]`:
 - `pytest==7.4.4` - Testing framework
 - `pytest-flask==1.3.0` - Flask testing utilities
 - `pytest-cov==4.1.0` - Coverage reporting
 - `coverage==7.4.1` - Coverage measurement
+- `aiosmtpd==1.4.6`, `atpublic==6.0.1` - Local SMTP support used by email tests
+
+The `test` group is a default group (see `[tool.uv]` in `pyproject.toml`),
+so `uv run` includes it automatically.
+
+Production's Docker image is unaffected: it still installs from
+`requirements.txt`, which is regenerated from `uv.lock` via
+`uv export --no-default-groups --no-annotate --no-hashes -o requirements.txt`
+whenever dependencies change.
 
 ## Running Tests
 
 ### Quick Start
 ```bash
-# Install test dependencies
-pip install -r requirements-test.txt
-
-# Run all tests with coverage
-python run_tests.py
+# Run all tests with coverage (uv manages the isolated .venv automatically)
+uv run pytest
 ```
 
 ### Manual Testing
 ```bash
-# Set testing environment
-export FLASK_ENV=testing
-
 # Run all tests
-python -m pytest tests/ -v
+uv run pytest -v
 
-# Run specific test file
-python -m pytest tests/test_basic.py -v
+# Run a specific test file
+uv run pytest tests/test_scheduler.py -v
 
-# Run with coverage report
-python -m pytest tests/ --cov=app --cov-report=html
+# Run a subset by keyword
+uv run pytest tests/test_scheduler.py -k "liveness or acquire" -v
 ```
+
+Coverage (`--cov=app --cov-report=term-missing`) and pytest options are
+configured in `pyproject.toml` under `[tool.pytest.ini_options]`, so no
+extra flags are needed. Coverage is reported to the terminal only - no
+HTML report (`htmlcov/`) is generated.
+
+There is no MariaDB dependency for tests: the suite uses an in-memory
+SQLite database, a mocked `BackgroundScheduler`, and `tempfile`/`tmp_path`
+for filesystem interactions, so `uv run pytest` works standalone.
 
 ## Current Test Coverage
 
 The test suite currently includes:
 
-### Basic Application Tests (`test_basic.py`)
-- ✅ Application creation with TestingConfig
-- ✅ Database connection and table creation
-- ✅ Test client functionality
-- ✅ Configuration validation
+### Scheduler Tests (`test_scheduler.py`)
+- ✅ `update_rankings_job` execution, error handling, and app-context creation
+- ✅ `init_scheduler` enable/disable and lock acquisition behavior
+- ✅ Lock-file liveness helpers (`_read_lock_pid`, `_is_process_alive`)
+- ✅ Atomic lock acquisition and stale-lock reclaim (`_acquire_scheduler_lock`)
+- ✅ End-to-end recovery: a lock left behind by a hard-killed worker (dead
+  PID) is reclaimed and the scheduler starts; a lock held by a live
+  process blocks a second worker from starting its own scheduler
 
-### Model Tests (`test_run_simple.py`)
-- ✅ User model creation with required fields
-- ✅ Role model creation
-- ✅ User password hashing and verification
-- ✅ Basic route accessibility
+### Form Tests (`test_forms.py`)
+- ✅ Avatar file size validation
+- ✅ Avatar-related configuration checks
 
-### Coverage Report
-Current coverage: **49%** (440/862 lines covered)
+## Scheduler Lock Recovery
 
-Key areas covered:
-- Application initialization (93%)
-- User forms (78%)
-- Services (69%)
-- Models (49% - basic functionality)
-- User routes (35% - authentication flows)
+`app/scheduler.py` uses a PID-based lock file (`/tmp/scheduler_lock`) so
+only one Gunicorn worker runs the ranking-update job. If a worker is
+killed hard (e.g. a `WORKER TIMEOUT` → `SIGKILL`, often from OOM), its
+`atexit` cleanup never runs and the lock file can be left behind holding
+a dead PID. On the next `init_scheduler` call, the stored PID's liveness
+is checked (`os.kill(pid, 0)`); a dead or invalid PID causes the stale
+lock to be removed and atomically reclaimed, so the scheduler self-heals
+without requiring a container restart. A guarded `SIGTERM` handler also
+runs the same cleanup on graceful shutdown, chaining to any
+previously-installed handler (e.g. Gunicorn's own) so existing shutdown
+behavior is preserved.
 
 ## Test Fixtures
 
@@ -109,7 +126,6 @@ The `conftest.py` provides several fixtures:
 ## Future Enhancements
 
 Areas for additional test coverage:
-- Form validation tests
 - Rating system functionality
 - File upload handling
 - User authentication flows
@@ -123,16 +139,16 @@ Areas for additional test coverage:
 
 1. **Database Constraints**: Ensure test data includes all required fields
 2. **Import Errors**: Check that imported modules exist and are accessible
-3. **Configuration**: Verify FLASK_ENV=testing is set
-4. **Dependencies**: Install test requirements with `pip install -r requirements-test.txt`
+3. **Dependencies**: Run `uv sync` to make sure the `.venv` is up to date
+   with `pyproject.toml` / `uv.lock`
 
 ### Debug Mode
 ```bash
 # Run tests with more verbose output
-python -m pytest tests/ -v -s
+uv run pytest tests/ -v -s
 
-# Run specific test with debugging
-python -m pytest tests/test_basic.py::TestBasicSetup::test_app_creation -v -s
+# Run a specific test with debugging
+uv run pytest tests/test_scheduler.py::TestAcquireSchedulerLock::test_fresh_lock_is_acquired -v -s
 ```
 
 ## Integration with CI/CD
@@ -141,11 +157,9 @@ The test suite is ready for integration with CI/CD pipelines:
 
 ```yaml
 # Example GitHub Actions workflow
-- name: Install dependencies
-  run: pip install -r requirements-test.txt
+- name: Install uv
+  uses: astral-sh/setup-uv@v3
 
 - name: Run tests
-  run: python run_tests.py
-  env:
-    FLASK_ENV: testing
+  run: uv run pytest
 ```

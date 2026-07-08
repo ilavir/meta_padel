@@ -66,6 +66,7 @@ A Flask-based web application for managing padel/tennis player ratings and score
 
 - Python 3.13+
 - MariaDB or SQLite
+- [`uv`](https://docs.astral.sh/uv/getting-started/installation/) (for local development and running tests)
 
 ### Setup
 
@@ -128,23 +129,26 @@ The application runs with the following services:
 
 ### Running Tests
 
-The application includes a comprehensive test suite using pytest.
+The application includes a comprehensive test suite using pytest, run via
+[`uv`](https://docs.astral.sh/uv/), which manages an isolated virtual
+environment from `pyproject.toml`/`uv.lock` — no manual `pip install` needed.
 
 ```bash
-# Install test dependencies
-pip install -r requirements-test.txt
+# Run all tests (uv creates/updates .venv automatically)
+uv run pytest
 
-# Run all tests
-python run_tests.py
+# Run a specific test file
+uv run pytest tests/test_scheduler.py -v
+```
 
-# Or run tests manually
-FLASK_ENV=testing python -m pytest tests/ -v
+Coverage (`--cov=app --cov-report=term-missing`) is configured in
+`pyproject.toml` and reported to the terminal only; no HTML report is
+generated. See `TESTING.md` for details.
 
-# Run specific test file
-FLASK_ENV=testing python -m pytest tests/test_basic.py -v
-
-# Run with coverage
-FLASK_ENV=testing python -m pytest tests/ --cov=app --cov-report=html
+Production's Docker image still installs from `requirements.txt` (pip),
+which is regenerated from the `uv` lockfile via:
+```bash
+uv export --no-default-groups --no-annotate --no-hashes -o requirements.txt
 ```
 
 #### Test Structure
@@ -152,12 +156,8 @@ FLASK_ENV=testing python -m pytest tests/ --cov=app --cov-report=html
 ```
 tests/
 ├── conftest.py           # Test configuration and fixtures
-├── test_basic.py         # Basic application tests
-├── test_models.py        # Database model tests
-├── test_user_routes.py   # User authentication tests
-├── test_rating_routes.py # Rating system tests
 ├── test_forms.py         # Form validation tests
-└── test_utils.py         # Utility function tests
+└── test_scheduler.py     # Scheduler job and lock-recovery tests
 ```
 
 #### Test Configuration

@@ -1,6 +1,9 @@
 #!/usr/bin/env python3
 """
 Test runner for Meta Padel Rating System
+
+Delegates to `uv run pytest`, which manages the isolated virtual
+environment and test dependencies declared in pyproject.toml.
 """
 import os
 import sys
@@ -8,19 +11,11 @@ import subprocess
 
 
 def run_tests():
-    """Run the test suite."""
+    """Run the test suite via uv."""
     # Set testing environment
     os.environ['FLASK_ENV'] = 'testing'
 
-    # Run pytest with coverage
-    cmd = [
-        sys.executable, '-m', 'pytest',
-        'tests/',
-        '-v',
-        '--cov=app',
-        '--cov-report=term-missing',
-        '--cov-report=html:htmlcov'
-    ]
+    cmd = ['uv', 'run', 'pytest'] + sys.argv[1:]
 
     print("Running Meta Padel Rating System tests...")
     print("=" * 50)
@@ -30,7 +25,6 @@ def run_tests():
     if result.returncode == 0:
         print("\n" + "=" * 50)
         print("✅ All tests passed!")
-        print("📊 Coverage report generated in htmlcov/")
     else:
         print("\n" + "=" * 50)
         print("❌ Some tests failed!")
