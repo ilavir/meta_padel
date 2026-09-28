@@ -34,7 +34,7 @@ class TestUpdateRankingsJob:
             update_rankings_job()
             
             # Verify take_rank_snapshot was called for all gender/season types
-            expected_calls = [call('all'), call('male'), call('female'), call('summer_2026')]
+            expected_calls = [call('all'), call('male'), call('female'), call('autumn_2026')]
             mock_snapshot.assert_has_calls(expected_calls, any_order=False)
             assert mock_snapshot.call_count == 4
 
@@ -304,7 +304,7 @@ class TestSchedulerIntegration:
             update_rankings_job()
             
             # Verify all ranking types were called
-            expected_calls = [call('all'), call('male'), call('female'), call('summer_2026')]
+            expected_calls = [call('all'), call('male'), call('female'), call('autumn_2026')]
             mock_snapshot.assert_has_calls(expected_calls, any_order=False)
             assert mock_snapshot.call_count == 4
 
