@@ -229,12 +229,14 @@ def reset_password_request():
 @bp.route('/reset_password/<token>', methods=['GET', 'POST'])
 def reset_password(token):
     if current_user.is_authenticated:
-        return redirect(url_for('rating.index'))
+        flash('Вы уже вошли в систему. Чтобы сбросить пароль по ссылке, сначала выйдите из аккаунта.')
+        return redirect(url_for('user.my_profile'))
 
     user = User.verify_reset_password_token(token)
     if not user:
         logger.warning(f'Invalid password reset token: {token}')
-        return redirect(url_for('rating.index'))
+        flash('Ссылка для сброса пароля недействительна или устарела. Запросите новую.')
+        return redirect(url_for('user.reset_password_request'))
 
     form = ResetPasswordForm()
 

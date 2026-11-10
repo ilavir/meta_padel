@@ -86,7 +86,7 @@ class User(UserMixin, BaseModel):
     def check_password(self, password):
         return check_password_hash(self.password_hash, password)
 
-    def get_reset_password_token(self, expires_in=600):
+    def get_reset_password_token(self, expires_in=1800):
         return jwt.encode(
             {'user_id': self.id, 'exp': int(datetime.now(timezone.utc).timestamp()) + expires_in},
             current_app.config['SECRET_KEY'], algorithm='HS256')
